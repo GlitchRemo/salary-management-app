@@ -1,0 +1,77 @@
+// Database schema for ACME Salary Management Application
+// ORM: Prisma
+// Database: SQLite
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// HRUser
+// Represents an authorised HR manager.
+// Only HR users can access the application.
+// ─────────────────────────────────────────────
+model HRUser {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  // Bcrypt hash — never expose in API responses
+  passwordHash String
+  createdAt    DateTime     @default(now())
+
+  salaryAudits SalaryAudit[]
+}
+
+// ─────────────────────────────────────────────
+// Employee
+// Represents an employee whose salary is managed by HR.
+// Country determines currency — currency is not independently editable.
+// Country is read-only after creation (transfers are out of scope).
+// ─────────────────────────────────────────────
+model Employee {
+  id           String       @id @default(cuid())
+  name         String
+  email        String       @unique
+  department   String
+  country      String
+  // Derived from country at seed time — not independently editable
+  currency     String
+  baseSalary   Float
+  bonus        Float        @default(0)
+  createdAt    DateTime     @default(now())
+  // Updated automatically on every salary change
+  updatedAt    DateTime     @updatedAt
+
+  salaryAudits SalaryAudit[]
+
+  @@index([country])
+  @@index([department])
+  @@index([name])
+}
+
+// ─────────────────────────────────────────────
+// SalaryAudit
+// Immutable record of every salary change.
+// Created automatically by the service layer on every update.
+// Never deleted or modified.
+// ─────────────────────────────────────────────
+model SalaryAudit {
+  id                  String   @id @default(cuid())
+  employeeId          String
+  changedById         String
+  previousBaseSalary  Float
+  newBaseSalary       Float
+  previousBonus       Float
+  newBonus            Float
+  createdAt           DateTime @default(now())
+
+  employee    Employee @relation(fields: [employeeId], references: [id])
+  changedBy   HRUser   @relation(fields: [changedById], references: [id])
+
+  @@index([employeeId])
+  @@index([changedById])
+}
