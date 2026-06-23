@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { buildEmployee, buildEmployeeRow } from "@/test/fixtures";
+import { Country, Department } from "@/app/generated/prisma/enums";
 
 // --- mock the repository before importing the service ---
 vi.mock("./employee.repository", () => ({
@@ -70,6 +71,51 @@ describe("listEmployees", () => {
     await listEmployees();
 
     expect(mockFindAllEmployees).toHaveBeenCalledOnce();
+  });
+
+  it("passes filters through to findAllEmployees", async () => {
+    const filters = { search: "alice", country: Country.US, department: Department.Engineering };
+    mockFindAllEmployees.mockResolvedValue([]);
+
+    await listEmployees(filters);
+
+    expect(mockFindAllEmployees).toHaveBeenCalledWith(filters);
+  });
+
+  it("returns all results when no search term is given", async () => {
+    const rows = [
+      buildEmployeeRow({ id: "1", email: "a@acme.com", name: "Alice Smith" }),
+      buildEmployeeRow({ id: "2", email: "b@acme.com", name: "Bob Jones" }),
+    ];
+    mockFindAllEmployees.mockResolvedValue(rows);
+
+    const result = await listEmployees({ country: Country.US });
+
+    expect(result).toHaveLength(2);
+  });
+
+  it("returns fuzzy-matched results when a search term is given", async () => {
+    const rows = [
+      buildEmployeeRow({ id: "1", email: "a@acme.com", name: "Alice Smith" }),
+      buildEmployeeRow({ id: "2", email: "b@acme.com", name: "Bob Jones" }),
+    ];
+    mockFindAllEmployees.mockResolvedValue(rows);
+
+    const result = await listEmployees({ search: "Alice" });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("Alice Smith");
+  });
+
+  it("returns an empty array when no employees match the search term", async () => {
+    const rows = [
+      buildEmployeeRow({ id: "1", email: "a@acme.com", name: "Alice Smith" }),
+    ];
+    mockFindAllEmployees.mockResolvedValue(rows);
+
+    const result = await listEmployees({ search: "Zebediah" });
+
+    expect(result).toHaveLength(0);
   });
 });
 

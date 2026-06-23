@@ -1,4 +1,5 @@
 import type { Employee } from "@/app/generated/prisma/client";
+import type { Country, Department } from "@/app/generated/prisma/enums";
 
 export type EmployeeRow = Pick<
   Employee,
@@ -20,4 +21,10 @@ export type EmployeeDto = {
   bonus: number;
   createdAt: string;
   updatedAt: string;
+};
+
+export type EmployeeFilters = {
+  search?: string;
+  country?: Country;
+  department?: Department;
 };

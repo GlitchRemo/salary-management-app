@@ -1,10 +1,11 @@
 import { prisma } from "@/server/db/client";
 import type { Employee } from "@/app/generated/prisma/client";
-import type { EmployeeRow } from "./employee.types";
+import type { EmployeeFilters, EmployeeRow } from "./employee.types";
 
 export type { EmployeeRow } from "./employee.types";
 
-export async function findAllEmployees(): Promise<EmployeeRow[]> {
+export async function findAllEmployees(filters: EmployeeFilters = {}): Promise<EmployeeRow[]> {
+  const { country, department } = filters;
   return prisma.employee.findMany({
     select: {
       id: true,
@@ -15,6 +16,10 @@ export async function findAllEmployees(): Promise<EmployeeRow[]> {
       currency: true,
       baseSalary: true,
       bonus: true,
+    },
+    where: {
+      ...(country && { country }),
+      ...(department && { department }),
     },
     orderBy: { name: "asc" },
   });

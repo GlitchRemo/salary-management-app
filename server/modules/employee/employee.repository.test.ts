@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { buildEmployee } from "@/test/fixtures";
+import { Country, Department } from "@/app/generated/prisma/enums";
 
 // --- mock the prisma singleton before importing the module under test ---
 vi.mock("@/server/db/client", () => ({
@@ -39,10 +40,12 @@ describe("findAllEmployees", () => {
     const result = await findAllEmployees();
 
     expect(mockFindMany).toHaveBeenCalledOnce();
-    expect(mockFindMany).toHaveBeenCalledWith({
-      select: expect.objectContaining({ name: true, email: true, baseSalary: true, bonus: true }),
-      orderBy: { name: "asc" },
-    });
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({ name: true, email: true, baseSalary: true, bonus: true }),
+        orderBy: { name: "asc" },
+      })
+    );
     expect(result).toEqual([alice, bob]);
   });
 
@@ -71,6 +74,58 @@ describe("findAllEmployees", () => {
           baseSalary: true,
           bonus: true,
         },
+      })
+    );
+  });
+
+  it("passes empty where when no filters are provided", async () => {
+    mockFindMany.mockResolvedValue([]);
+
+    await findAllEmployees();
+
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: {} })
+    );
+  });
+
+  it("ignores search — fuzzy matching is handled by the service layer", async () => {
+    mockFindMany.mockResolvedValue([]);
+
+    await findAllEmployees({ search: "alice" });
+
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: {} })
+    );
+  });
+
+  it("filters by country", async () => {
+    mockFindMany.mockResolvedValue([]);
+
+    await findAllEmployees({ country: Country.US });
+
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { country: Country.US } })
+    );
+  });
+
+  it("filters by department", async () => {
+    mockFindMany.mockResolvedValue([]);
+
+    await findAllEmployees({ department: Department.Engineering });
+
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { department: Department.Engineering } })
+    );
+  });
+
+  it("combines country and department filters", async () => {
+    mockFindMany.mockResolvedValue([]);
+
+    await findAllEmployees({ country: Country.US, department: Department.Engineering });
+
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { country: Country.US, department: Department.Engineering },
       })
     );
   });
