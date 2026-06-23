@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { listEmployees } from "@/server/modules/employee/employee.service";
+import { revalidatePath } from "next/cache";
+import { listEmployees, importEmployees } from "@/server/modules/employee/employee.service";
 import { Country, Department } from "@/app/generated/prisma/enums";
-import type { EmployeeFilters } from "@/server/modules/employee/employee.types";
+import type { EmployeeFilters, ImportResult } from "@/server/modules/employee/employee.types";
 import { SearchBar } from "@/components/molecules/SearchBar";
 import { EnumFilterSelect } from "@/components/atoms/EnumFilterSelect";
+import { CsvUpload } from "@/components/organisms/CsvUpload";
 import { COUNTRY_OPTIONS, DEPARTMENT_OPTIONS } from "@/app/constants";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -35,6 +37,20 @@ export default async function EmployeesPage({
   };
   const employees = await listEmployees(filters);
 
+  async function handleCsvImport(formData: FormData): Promise<ImportResult> {
+    "use server";
+    const file = formData.get("file");
+    if (!(file instanceof File) || file.size === 0) {
+      return { success: false, errors: ["Please select a CSV file"] };
+    }
+    const csvContent = await file.text();
+    const result = await importEmployees(csvContent);
+    if (result.success) {
+      revalidatePath("/employees");
+    }
+    return result;
+  }
+
   return (
     <>
       <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
@@ -56,6 +72,9 @@ export default async function EmployeesPage({
           options={DEPARTMENT_OPTIONS}
           ariaLabel="Filter by department"
         />
+        <Box sx={{ ml: "auto" }}>
+          <CsvUpload onImport={handleCsvImport} />
+        </Box>
       </Box>
       <Paper elevation={0} variant="outlined" sx={{ borderRadius: 2, overflow: "hidden" }}>
         <TableContainer>

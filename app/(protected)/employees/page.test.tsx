@@ -14,6 +14,10 @@ vi.mock("@/components/atoms/EnumFilterSelect", () => ({
   EnumFilterSelect: () => null,
 }));
 
+vi.mock("@/components/organisms/CsvUpload", () => ({
+  CsvUpload: () => null,
+}));
+
 import { listEmployees } from "@/server/modules/employee/employee.service";
 import EmployeesPage from "@/app/(protected)/employees/page";
 

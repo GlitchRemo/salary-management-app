@@ -246,8 +246,8 @@ Commits
 * feat: add pagination
 * ✅ feat: implement csv parser service
 * ✅ feat: implement employee bulk import endpoint
-* feat: add csv upload component
-* feat: display import success and validation errors
+* ✅ feat: add csv upload component
+* ✅ feat: display import success and validation errors
 
 Definition of Done
 
