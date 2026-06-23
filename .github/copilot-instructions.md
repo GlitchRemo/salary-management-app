@@ -282,6 +282,7 @@ Forbidden:
 * any
 * @ts-ignore
 * eslint-disable
+* Type assertions (`as SomeType`, `as unknown as SomeType`) — use proper typing instead
 
 Avoid:
 
@@ -295,6 +296,8 @@ Prefer:
 * enums
 * readonly types
 * discriminated unions
+* `declare global` to extend globalThis instead of casting it
+* `vi.mocked()` to type mocked functions in tests instead of casting
 
 All functions should have explicit return types.
 
@@ -366,6 +369,12 @@ employee/
 * employee.types.ts
 * employee.schemas.ts
 * employee.test.ts
+
+Types live in `<feature>.types.ts`.
+
+Never define exported types inline inside a service, repository, or controller.
+Services and repositories re-export their types from the `.types.ts` file using `export type { ... } from`.
+Test files import types directly from `.types.ts`, not from the implementation file.
 
 ---
 
