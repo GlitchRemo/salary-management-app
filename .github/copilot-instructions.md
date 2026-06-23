@@ -401,8 +401,11 @@ Responsible for:
 
 * Business rules
 * Validation orchestration
+* Mapping repository entities to DTOs
 
 Should not contain database access.
+
+Pages call services — never repositories directly.
 
 ---
 

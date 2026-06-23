@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { findEmployeeById } from "@/server/modules/employee/employee.repository";
-import { toEmployeeDto } from "@/server/modules/employee/employee.mapper";
+import { getEmployee } from "@/server/modules/employee/employee.service";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -13,22 +12,20 @@ interface Props {
 
 export default async function EmployeeDetailsPage({ params }: Props) {
   const { id } = await params;
-  const employee = await findEmployeeById(id);
+  const employee = await getEmployee(id);
 
   if (!employee) {
     notFound();
   }
 
-  const dto = toEmployeeDto(employee);
-
   const fields = [
-    { label: "Email", value: dto.email },
-    { label: "Department", value: dto.department },
-    { label: "Country", value: dto.country },
-    { label: "Currency", value: dto.currency },
-    { label: "Base Salary", value: `${dto.currency} ${dto.baseSalary.toLocaleString()}` },
-    { label: "Bonus", value: `${dto.currency} ${dto.bonus.toLocaleString()}` },
-    { label: "Last Updated", value: new Date(dto.updatedAt).toLocaleDateString() },
+    { label: "Email", value: employee.email },
+    { label: "Department", value: employee.department },
+    { label: "Country", value: employee.country },
+    { label: "Currency", value: employee.currency },
+    { label: "Base Salary", value: `${employee.currency} ${employee.baseSalary.toLocaleString()}` },
+    { label: "Bonus", value: `${employee.currency} ${employee.bonus.toLocaleString()}` },
+    { label: "Last Updated", value: new Date(employee.updatedAt).toLocaleDateString() },
   ];
 
   return (
@@ -44,7 +41,7 @@ export default async function EmployeeDetailsPage({ params }: Props) {
         </Link>
       </Box>
       <Typography variant="h5" component="h1" sx={{ fontWeight: 600, mb: 3 }}>
-        {dto.name}
+        {employee.name}
       </Typography>
       <Paper elevation={0} variant="outlined" sx={{ borderRadius: 2, p: 3 }}>
         <Box
