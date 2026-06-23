@@ -48,4 +48,20 @@ describe("EmployeesPage", () => {
     render(await EmployeesPage());
     expect(screen.getByText("USD 85,000")).toBeInTheDocument();
   });
+
+  it("renders a navigation arrow link for each employee row", async () => {
+    vi.mocked(listEmployees).mockResolvedValue([
+      buildEmployeeListItem({ id: "emp_1", name: "Jane Smith" }),
+      buildEmployeeListItem({ id: "emp_2", name: "John Doe" }),
+    ]);
+    render(await EmployeesPage());
+    expect(screen.getByRole("link", { name: /view details for jane smith/i })).toHaveAttribute(
+      "href",
+      "/employees/emp_1",
+    );
+    expect(screen.getByRole("link", { name: /view details for john doe/i })).toHaveAttribute(
+      "href",
+      "/employees/emp_2",
+    );
+  });
 });

@@ -1,5 +1,5 @@
 import type { Employee, SalaryAudit, HRUser } from "@/app/generated/prisma/client";
-import type { EmployeeRow, EmployeeListItem } from "@/server/modules/employee/employee.types";
+import type { EmployeeDto, EmployeeRow, EmployeeListItem } from "@/server/modules/employee/employee.types";
 
 export function buildEmployee(overrides: Partial<Employee> = {}): Employee {
   return {
@@ -44,6 +44,22 @@ export function buildEmployeeListItem(
     baseSalary: 80000,
     bonus: 5000,
     totalCompensation: 85000,
+    ...overrides,
+  };
+}
+
+export function buildEmployeeDto(overrides: Partial<EmployeeDto> = {}): EmployeeDto {
+  return {
+    id: "emp_1",
+    name: "Jane Smith",
+    email: "jane.smith@acme.com",
+    department: "Engineering",
+    country: "US",
+    currency: "USD",
+    baseSalary: 80000,
+    bonus: 5000,
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2026-06-23T00:00:00.000Z",
     ...overrides,
   };
 }

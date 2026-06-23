@@ -92,16 +92,6 @@ Integration:
 
 * ✅ Data flows: Database → DAL (repositories/services) → Server Component → Browser
 
-Commits
-
-1. docs: add roadmap and project structure
-2. feat: define domain schemas
-3. feat: configure prisma and create database tables
-4. feat: add seed script with HR user and employees
-5. test: add employee repository tests
-6. feat: initialize nextjs app
-7. feat: connect frontend to db via server components and verify end-to-end flow
-
 Definition of Done
 
 Data flows successfully:
@@ -189,11 +179,9 @@ Commits
 
 1. ✅ feat: implement salary update service
 2. ✅ feat: persist salary audit records
-3. ✅ feat: expose update salary endpoint
-4. ✅ feat: expose get employee endpoint
-5. feat: add employee details page
-6. feat: add salary update modal
-7. feat: refresh employee table after updates
+3. ✅ feat: add employee details page
+4. feat: add salary update modal
+5. feat: refresh employee table after updates
 
 Definition of Done
 

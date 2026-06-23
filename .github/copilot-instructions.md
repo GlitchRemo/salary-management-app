@@ -367,7 +367,6 @@ Avoid root-level folders like:
 
 Each feature should contain:
 
-* controller
 * service
 * repository
 * mapper
@@ -379,7 +378,6 @@ Example:
 
 employee/
 
-* employee.controller.ts
 * employee.service.ts
 * employee.repository.ts
 * employee.mapper.ts
@@ -396,18 +394,6 @@ Test files import types directly from `.types.ts`, not from the implementation f
 ---
 
 # Layer Responsibilities
-
-## Controller
-
-Responsible for:
-
-* HTTP
-* Request parsing
-* Response mapping
-
-Should not contain business logic.
-
----
 
 ## Service
 

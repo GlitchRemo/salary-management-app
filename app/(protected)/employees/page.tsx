@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { listEmployees } from "@/server/modules/employee/employee.service";
 import Typography from "@mui/material/Typography";
 import Table from "@mui/material/Table";
@@ -7,6 +8,7 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import Paper from "@mui/material/Paper";
 import TableContainer from "@mui/material/TableContainer";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 export default async function EmployeesPage() {
   const employees = await listEmployees();
@@ -28,6 +30,7 @@ export default async function EmployeesPage() {
                 <TableCell align="right" sx={{ color: "primary.contrastText", fontWeight: 600 }}>Base Salary</TableCell>
                 <TableCell align="right" sx={{ color: "primary.contrastText", fontWeight: 600 }}>Bonus</TableCell>
                 <TableCell align="right" sx={{ color: "primary.contrastText", fontWeight: 600 }}>Total</TableCell>
+                <TableCell sx={{ color: "primary.contrastText", width: 48 }} />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -45,6 +48,15 @@ export default async function EmployeesPage() {
                   </TableCell>
                   <TableCell align="right" sx={{ fontWeight: 600 }}>
                     {emp.currency} {emp.totalCompensation.toLocaleString()}
+                  </TableCell>
+                  <TableCell align="right" sx={{ width: 48, pr: 1 }}>
+                    <Link
+                      href={`/employees/${emp.id}`}
+                      aria-label={`View details for ${emp.name}`}
+                      style={{ display: "flex", alignItems: "center", color: "inherit" }}
+                    >
+                      <ChevronRightIcon fontSize="small" color="action" />
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}

@@ -25,10 +25,10 @@ Browser
 ```
 
 > **Decision (2026-06-23):** A separate Express REST API was dropped in favour of
-> Next.js Server Components with a server-side Data Access Layer. Data is fetched
-> directly on the server during rendering — no HTTP round-trip is needed for
-> read-heavy pages. API Routes will be introduced only for mutation endpoints
-> (salary updates, CSV import) where a client-side request is required.
+> Next.js Server Components with a server-side Data Access Layer.
+>
+> **Decision (2026-06-23):** API Routes and Server Actions removed entirely.
+> Pages call service and repository functions directly. No HTTP layer exists.
 
 ---
 
@@ -36,11 +36,10 @@ Browser
 
 | Layer | Technology | Responsibility |
 |---|---|---|
-| Pages (Server Components) | Next.js | Routing, page composition, server-side data fetching |
-| Components | React + Material UI + Tailwind CSS | UI rendering, user interaction |
-| API Routes | Next.js Route Handlers | Mutation endpoints (POST/PATCH/DELETE) |
-| Services | TypeScript (`server/db/services/`) | Business rules, validation orchestration |
-| Repositories | Prisma (`server/db/repositories/`) | Database access, queries |
+| Pages (Server Components) | Next.js | Routing, page composition, direct service/repository calls |
+| Components | React + Material UI | UI rendering, user interaction |
+| Services | TypeScript | Business rules, validation orchestration |
+| Repositories | Prisma | Database access, queries |
 | DB Client | Prisma + adapter-libsql (`server/db/client.ts`) | Connection singleton |
 | Database | SQLite | Persistence |
 
@@ -64,14 +63,9 @@ server/
 
 Next.js API Routes for mutations will be co-located with the app router:
 
-```
-app/
-└── api/
-    └── employees/
-        ├── route.ts           # GET (paginated), POST
-        └── [id]/
-            └── route.ts       # PATCH salary, GET details
-```
+
+> No `app/api/` routes exist in this project.
+> Pages call services and repositories directly.
 
 ---
 
@@ -131,23 +125,23 @@ components/
 ## Dependency Flow
 
 ```
-Server Component Pages → Services → Repositories → Prisma → SQLite
-Client Components       → API Routes → Services → Repositories → Prisma → SQLite
-UI Components           → Organisms → Molecules → Atoms
+Pages      → Services → Repositories → Prisma → SQLite
+Components → Pages (props) → Services → Repositories → Prisma → SQLite
+UI         → Organisms → Molecules → Atoms
 ```
 
+Pages call services and repositories directly.
 Services depend on Repositories.
 Repositories depend on Prisma.
-Server Components and API Routes depend on Services.
 No reverse dependencies.
-Prisma entities are never passed directly to Client Components.
+Prisma entities are never passed directly to pages or Client Components.
 
 ---
 
 ## Data Mapping Flow
 
 ```
-Prisma Entity → Mapper → DTO → API Response
+Prisma Entity → Mapper → DTO → Page / Component
 ```
 
-Prisma entities are never exposed directly in API responses.
+Prisma entities are never exposed directly in pages or passed to Client Components.

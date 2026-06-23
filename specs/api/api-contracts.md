@@ -1,18 +1,93 @@
-# API Contracts
+# Data Contracts
 
-## Conventions
-
-* All endpoints are prefixed with `/api`.
-* Request and response bodies are JSON.
-* Dates are ISO 8601 strings.
-* Pagination uses `page` and `pageSize` query parameters.
-* Errors follow the format defined in `error-contracts.md`.
+> **Note (2026-06-23):** This project has no REST API or Server Actions.
+> Pages and components call service and repository functions directly.
+> This document defines the shared data shapes (DTOs) and the input/output
+> contracts for each service operation that crosses a layer boundary.
 
 ---
 
-## Authentication
+## Conventions
 
-### POST /api/auth/login
+* All DTOs are plain TypeScript objects — no class instances.
+* Dates are ISO 8601 strings in DTOs (converted from `Date` objects by mappers).
+* Service inputs are validated with Zod at the call site.
+* Services return DTOs — never raw Prisma entities.
+* Errors follow the structure in `error-contracts.md`.
+
+---
+
+## DTOs
+
+### EmployeeDto
+
+Returned by mappers and Server Actions involving employees.
+
+```ts
+type EmployeeDto = {
+  id: string;
+  name: string;
+  email: string;
+  department: string;
+  country: string;
+  currency: string;
+  baseSalary: number;
+  bonus: number;
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+};
+```
+
+---
+
+## Service Operations
+
+### updateSalary
+
+**File:** `server/modules/salary/salary.service.ts`
+
+**Purpose:** Update an employee's base salary and bonus. Creates a `SalaryAudit` record.
+
+**Input**
+
+```ts
+{
+  employeeId: string;
+  baseSalary: number; // must be > 0
+  bonus: number;      // must be >= 0
+  changedById: string;
+}
+```
+
+**Output:** `Employee` (Prisma entity) — mapped to `EmployeeDto` by the caller.
+
+**Errors:** `NotFoundError` if employee does not exist.
+
+---
+
+### importEmployees
+
+**File:** `server/modules/employee/employee.service.ts`
+
+**Purpose:** Upsert employee records from parsed CSV rows. New employees are inserted; existing employees matched by `employeeId` are updated.
+
+**Input:** Array of validated employee row objects conforming to the CSV column contract.
+
+**CSV column contract:** `employeeId`, `firstName`, `lastName`, `email`, `department`, `country`, `currency`, `baseSalary`, `bonus`
+
+All columns required. No extra columns permitted. No partial imports.
+
+**Output**
+
+```ts
+{
+  created: number;
+  updated: number;
+}
+```
+
+**Errors:** `ValidationError` for malformed rows.
+
 
 **Request**
 

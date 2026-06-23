@@ -1,8 +1,59 @@
 # Error Contracts
 
-## Standard Error Response
+> **Note (2026-06-23):** There is no REST API or Server Actions layer.
+> Errors are surfaced by throwing typed error classes from services,
+> caught by pages or components, and mapped to UI state.
 
-All errors return a consistent JSON structure.
+---
+
+## Error Classes
+
+Defined in `server/errors.ts`. Thrown by services and caught at the page or component level.
+
+### ValidationError
+
+Thrown when input fails Zod validation.
+
+```ts
+class ValidationError extends Error {
+  code = "VALIDATION_ERROR";
+  details: Array<{ field: string; message: string }>;
+}
+```
+
+---
+
+### NotFoundError
+
+Thrown when a referenced entity does not exist.
+
+```ts
+class NotFoundError extends Error {
+  code = "NOT_FOUND";
+}
+```
+
+For page-level 404s call `notFound()` from `next/navigation` — Next.js renders the nearest `not-found.tsx`.
+
+---
+
+### AppError
+
+Base class for all application errors.
+
+```ts
+class AppError extends Error {
+  code: string;
+}
+```
+
+---
+
+## Authentication Errors
+
+Phase 8 will introduce session-based authentication. Unauthenticated access to
+protected routes will be handled by Next.js middleware redirecting to `/login`.
+
 
 ```json
 {

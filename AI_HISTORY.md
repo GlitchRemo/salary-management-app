@@ -4,6 +4,47 @@ This file records significant specification or architectural decisions made with
 
 ---
 
+## 2026-06-23 — Removed Server Actions; pages call service functions directly
+
+**Cause**
+
+Server Actions were introduced as the mutation layer after removing API routes. On reflection this adds an unnecessary abstraction — `*.actions.ts` files are thin wrappers that just delegate to services. Pages already call services directly for reads; mutations can follow the same pattern.
+
+**Decision**
+
+* Remove `*.actions.ts` from the architecture and feature file conventions.
+* Pages and components call service functions directly for both reads and mutations.
+* No dedicated mutation layer exists — services are the lowest shared abstraction.
+* `specs/api/api-contracts.md` updated: "Server Actions" section replaced with "Service Operations".
+* `specs/api/error-contracts.md` updated: "Server Action Errors" replaced with "Error Classes".
+
+---
+
+## 2026-06-23 — Removed REST API routes; adopted direct service calls
+
+**Cause**
+
+The project had a `app/api/` folder with Next.js Route Handlers for reading and mutating employee data. On review, this was identified as unnecessary indirection:
+
+* Calling your own API Routes from a Server Component creates a loopback HTTP request, adding latency and potential SSR failure.
+* Next.js documentation explicitly recommends querying the ORM or database directly from Server Components.
+
+**Decision**
+
+* Delete `app/api/` entirely.
+* Pages call service and repository functions directly.
+* `specs/api/api-contracts.md` repurposed to document DTOs and service operation contracts.
+* `specs/api/error-contracts.md` repurposed to document typed error classes.
+
+**Notes**
+
+* The salary update endpoint (`PATCH /api/employees/:id/salary`) was deleted. Salary updates will be triggered by calling `updateSalary()` from the service directly.
+* `test/request-builders.ts` deleted (only used by API route tests).
+* `server/modules/employee/employee.api.ts` deleted.
+* `APP_URL` env var removed.
+
+---
+
 ## 2026-06-23 — PostgreSQL + Vercel → SQLite + Render
 
 **Cause**
