@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { EmployeeRow } from "./employee.types";
+import { buildEmployeeRow } from "@/test/fixtures";
 
 // --- mock the repository before importing the service ---
 vi.mock("./employee.repository", () => ({
@@ -10,22 +10,6 @@ import { findAllEmployees } from "./employee.repository";
 import { listEmployees } from "./employee.service";
 
 // ---------------------------------------------------------------------------
-// Test factory
-// ---------------------------------------------------------------------------
-
-function buildEmployeeRow(overrides: Partial<EmployeeRow> = {}): EmployeeRow {
-  return {
-    id: "emp_test_1",
-    name: "Jane Smith",
-    email: "jane.smith@acme.com",
-    department: "Engineering",
-    country: "US",
-    currency: "USD",
-    baseSalary: 75000,
-    bonus: 5000,
-    ...overrides,
-  };
-}
 
 const mockFindAllEmployees = vi.mocked(findAllEmployees);
 

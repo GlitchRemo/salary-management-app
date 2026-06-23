@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Employee, SalaryAudit } from "@/app/generated/prisma/client";
+import { buildEmployee, buildSalaryAudit } from "@/test/fixtures";
 
 vi.mock("../employee/employee.repository", () => ({
   findEmployeeById: vi.fn(),
@@ -15,35 +15,6 @@ import { updateEmployeeSalary, createSalaryAudit } from "./salary.repository";
 import { updateSalary } from "./salary.service";
 import { ValidationError, NotFoundError } from "@/server/errors";
 
-function buildEmployee(overrides: Partial<Employee> = {}): Employee {
-  return {
-    id: "emp_1",
-    name: "Jane Smith",
-    email: "jane@acme.com",
-    department: "Engineering",
-    country: "US",
-    currency: "USD",
-    baseSalary: 80000,
-    bonus: 5000,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overrides,
-  };
-}
-
-function buildSalaryAudit(overrides: Partial<SalaryAudit> = {}): SalaryAudit {
-  return {
-    id: "audit_1",
-    employeeId: "emp_1",
-    changedById: "hr_1",
-    previousBaseSalary: 80000,
-    newBaseSalary: 90000,
-    previousBonus: 5000,
-    newBonus: 6000,
-    createdAt: new Date(),
-    ...overrides,
-  };
-}
 
 describe("updateSalary", () => {
   beforeEach(() => {

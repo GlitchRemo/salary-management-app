@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Employee } from "@/app/generated/prisma/client";
+import { buildEmployee } from "@/test/fixtures";
 
 // --- mock the prisma singleton before importing the module under test ---
 vi.mock("@/server/db/client", () => ({
@@ -18,24 +18,6 @@ import {
 } from "./employee.repository";
 
 // ---------------------------------------------------------------------------
-// Test factory
-// ---------------------------------------------------------------------------
-
-function buildEmployee(overrides: Partial<Employee> = {}): Employee {
-  return {
-    id: "emp_test_1",
-    name: "Jane Smith",
-    email: "jane.smith@acme.com",
-    department: "Engineering",
-    country: "US",
-    currency: "USD",
-    baseSalary: 75000,
-    bonus: 5000,
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01"),
-    ...overrides,
-  };
-}
 
 const mockFindMany = vi.mocked(prisma.employee.findMany);
 const mockFindUnique = vi.mocked(prisma.employee.findUnique);

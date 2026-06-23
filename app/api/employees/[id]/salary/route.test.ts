@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Employee } from "@/app/generated/prisma/client";
+import { buildEmployee } from "@/test/fixtures";
 
 vi.mock("@/server/modules/salary/salary.service", () => ({
   updateSalary: vi.fn(),
@@ -14,22 +14,6 @@ import { findFirstHrUserId } from "@/server/modules/hr-user/hr-user.repository";
 import { PATCH } from "@/app/api/employees/[id]/salary/route";
 import { NotFoundError } from "@/server/errors";
 import { buildPatchRequest } from "@/test/request-builders";
-
-function buildEmployee(overrides: Partial<Employee> = {}): Employee {
-  return {
-    id: "emp_1",
-    name: "Jane Smith",
-    email: "jane@acme.com",
-    department: "Engineering",
-    country: "US",
-    currency: "USD",
-    baseSalary: 80000,
-    bonus: 5000,
-    createdAt: new Date("2024-01-01T00:00:00Z"),
-    updatedAt: new Date("2026-06-23T00:00:00Z"),
-    ...overrides,
-  };
-}
 
 function buildContext(id: string): { params: Promise<{ id: string }> } {
   return { params: Promise.resolve({ id }) };
