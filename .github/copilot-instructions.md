@@ -532,7 +532,7 @@ Prefer straightforward code.
 
 # Material UI
 
-Material UI is the primary component library.
+Material UI v6 is the primary component library.
 
 Before creating custom components:
 
@@ -553,6 +553,17 @@ Prefer:
 Avoid rebuilding components that already exist.
 
 Use composition instead of excessive customization.
+
+Use `sx` prop for all style overrides — never `fontWeight`, `textAlign`, or spacing shorthand as direct props on MUI components.
+
+All theme values (colours, typography, spacing) live in `app/theme.ts`.
+
+The petrol + off-white theme:
+
+* Primary: `#005F6B`
+* Background default: `#F7F7F5`
+
+Do not hardcode these values outside of `app/theme.ts`.
 
 ---
 

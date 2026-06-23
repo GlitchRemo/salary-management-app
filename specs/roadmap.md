@@ -143,14 +143,14 @@ Pages
 
 Features
 
-* Application layout
+* ✅ Application layout — DashboardLayout with petrol/off-white MUI theme, AppBar, NavigationSidebar
 * Navigation sidebar
 * Empty dashboard page
 * Employee table
 
 Commits
 
-1. feat: add application layout
+1. ✅ feat: add application layout
 2. feat: add navigation sidebar
 3. feat: add dashboard placeholder page
 4. feat: build employee listing page

@@ -37,7 +37,7 @@ Browser
 | Layer | Technology | Responsibility |
 |---|---|---|
 | Pages (Server Components) | Next.js | Routing, page composition, server-side data fetching |
-| Components | React + Tailwind CSS | UI rendering, user interaction |
+| Components | React + Material UI + Tailwind CSS | UI rendering, user interaction |
 | API Routes | Next.js Route Handlers | Mutation endpoints (POST/PATCH/DELETE) |
 | Services | TypeScript (`server/db/services/`) | Business rules, validation orchestration |
 | Repositories | Prisma (`server/db/repositories/`) | Database access, queries |

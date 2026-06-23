@@ -19,16 +19,15 @@ Chosen because:
 * Improves readability and refactoring confidence.
 * Required for maintainable codebases at this scale.
 
-### Tailwind CSS
+### Material UI + Tailwind CSS
 
-Chosen (replaces Material UI, decision 2026-06-23) because:
+Material UI v6 re-introduced (2026-06-23) as the primary component library because:
 
-* Ships with the Next.js boilerplate — zero extra setup.
-* Utility-first approach is faster for building custom layouts.
-* No JavaScript bundle cost (pure CSS).
-* Sufficient for an internal tool that does not need a pre-built component catalogue.
+* MUI components (AppBar, Drawer, Table, DataGrid) eliminate layout boilerplate.
+* `@mui/material-nextjs` provides first-class App Router / emotion SSR integration.
+* Consistent design system via a single `theme.ts` — petrol (`#005F6B`) primary and off-white (`#F7F7F5`) background.
 
-Material UI was originally planned but deferred. It may be reintroduced if a richer component library (e.g. DataGrid for the employee table) becomes worthwhile.
+Tailwind CSS is kept for utility classes where MUI `sx` prop is overkill.
 
 ---
 
