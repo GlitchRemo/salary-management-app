@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model HRUser {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  passwordHash String
+  createdAt    DateTime      @default(now())
+
+  salaryAudits SalaryAudit[]
+}
+
+model Employee {
+  id         String   @id @default(cuid())
+  name       String
+  email      String   @unique
+  department String
+  country    String
+  currency   String
+  baseSalary Float
+  bonus      Float    @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  salaryAudits SalaryAudit[]
+
+  @@index([country])
+  @@index([department])
+  @@index([name])
+}
+
+model SalaryAudit {
+  id                 String   @id @default(cuid())
+  employeeId         String
+  changedById        String
+  previousBaseSalary Float
+  newBaseSalary      Float
+  previousBonus      Float
+  newBonus           Float
+  createdAt          DateTime @default(now())
+
+  employee  Employee @relation(fields: [employeeId], references: [id])
+  changedBy HRUser   @relation(fields: [changedById], references: [id])
+
+  @@index([employeeId])
+  @@index([changedById])
+}
