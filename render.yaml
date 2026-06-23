@@ -4,7 +4,7 @@ services:
     runtime: node
     region: oregon
     plan: free
-    buildCommand: pnpm install && pnpm prisma generate && pnpm prisma migrate deploy && pnpm build
+    buildCommand: pnpm install && pnpm prisma generate && pnpm prisma migrate deploy && pnpm tsx prisma/seed.ts && pnpm build
     startCommand: pnpm start
     envVars:
       - key: NODE_ENV

@@ -81,17 +81,22 @@ async function main() {
       create: data,
     });
 
-    // Seed one audit record per employee
-    await prisma.salaryAudit.create({
-      data: {
-        employeeId: employee.id,
-        changedById: hr.id,
-        previousBaseSalary: data.baseSalary - 5000,
-        newBaseSalary: data.baseSalary,
-        previousBonus: 0,
-        newBonus: data.bonus,
-      },
+    // Only create the initial audit record if none exist yet (idempotent)
+    const existingAudits = await prisma.salaryAudit.count({
+      where: { employeeId: employee.id },
     });
+    if (existingAudits === 0) {
+      await prisma.salaryAudit.create({
+        data: {
+          employeeId: employee.id,
+          changedById: hr.id,
+          previousBaseSalary: data.baseSalary - 5000,
+          newBaseSalary: data.baseSalary,
+          previousBonus: 0,
+          newBonus: data.bonus,
+        },
+      });
+    }
   }
 
   console.log("Seed complete.");
