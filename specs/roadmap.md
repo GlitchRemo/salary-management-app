@@ -110,7 +110,7 @@ Database → DAL → Server Component → Browser ✅
 
 ---
 
-# Phase 2 — Deployment Baseline
+# Phase 2 — Deployment Baseline ✅
 
 Goal
 
@@ -118,17 +118,16 @@ Ensure the application is continuously deployable.
 
 Features
 
-* Deploy application to Render
-* Deploy database (SQLite on Render persistent disk)
-* Configure environment variables
-* Verify API connectivity
-* Obtain publicly accessible URL
+* ✅ Deploy application to Render (via `render.yaml` Blueprint)
+* ✅ Deploy database (SQLite on Render persistent disk at `/data/dev.db`, 1 GB)
+* ✅ Configure environment variables (`DATABASE_URL`, `NODE_ENV` defined in `render.yaml`)
+* ✅ Migrations run automatically on every deploy (`prisma migrate deploy` in start command)
+* ⬜ Obtain publicly accessible URL (pending first deploy)
 
 Commits
 
-1. chore: configure deployment
-2. chore: deploy application and database
-3. docs: add deployment instructions
+1. chore: add render.yaml with web service and persistent disk
+2. docs: add deployment instructions to README
 
 Definition of Done
 
