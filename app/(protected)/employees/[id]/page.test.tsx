@@ -5,11 +5,20 @@ import { buildEmployeeDto } from "@/test/fixtures";
 vi.mock("@/server/modules/employee/employee.service", () => ({
   getEmployee: vi.fn(),
 }));
-
+vi.mock("@/server/modules/salary/salary.service", () => ({
+  updateSalary: vi.fn(),
+}));
+vi.mock("@/server/modules/hr-user/hr-user.repository", () => ({
+  findFirstHrUserId: vi.fn(),
+}));
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+}));
 vi.mock("next/navigation", () => ({
   notFound: vi.fn(() => {
     throw new Error("EMP_NOT_FOUND");
   }),
+  useRouter: vi.fn(() => ({ refresh: vi.fn() })),
 }));
 
 import { getEmployee } from "@/server/modules/employee/employee.service";
@@ -68,6 +77,13 @@ describe("EmployeeDetailsPage", () => {
     vi.mocked(getEmployee).mockResolvedValue(buildEmployeeDto());
     render(await EmployeeDetailsPage(buildParams("emp_42")));
     expect(vi.mocked(getEmployee)).toHaveBeenCalledWith("emp_42");
+  });
+
+  it("renders edit buttons for base salary and bonus", async () => {
+    vi.mocked(getEmployee).mockResolvedValue(buildEmployeeDto());
+    render(await EmployeeDetailsPage(buildParams("emp_1")));
+    expect(screen.getByRole("button", { name: /edit base salary/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /edit bonus/i })).toBeInTheDocument();
   });
 
   it("renders a back link to the employees page", async () => {

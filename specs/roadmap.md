@@ -180,8 +180,8 @@ Commits
 1. ✅ feat: implement salary update service
 2. ✅ feat: persist salary audit records
 3. ✅ feat: add employee details page
-4. feat: add salary update modal
-5. feat: refresh employee table after updates
+4. ✅ feat: add salary update modal
+5. ✅ feat: refresh employee table after updates
 
 Definition of Done
 

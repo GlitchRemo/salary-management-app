@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { getEmployee } from "@/server/modules/employee/employee.service";
+import { updateSalary } from "@/server/modules/salary/salary.service";
+import { findFirstHrUserId } from "@/server/modules/hr-user/hr-user.repository";
+import { SalaryUpdateModal } from "@/components/organisms/SalaryUpdateModal";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -18,14 +22,18 @@ export default async function EmployeeDetailsPage({ params }: Props) {
     notFound();
   }
 
-  const fields = [
+  async function handleSalaryUpdate(baseSalary: number, bonus: number) {
+    "use server";
+    const changedById = (await findFirstHrUserId()) ?? "system";
+    await updateSalary({ employeeId: id, baseSalary, bonus, changedById });
+    revalidatePath(`/employees/${id}`);
+  }
+
+  const readOnlyFields = [
     { label: "Email", value: employee.email },
     { label: "Department", value: employee.department },
     { label: "Country", value: employee.country },
     { label: "Currency", value: employee.currency },
-    { label: "Base Salary", value: `${employee.currency} ${employee.baseSalary.toLocaleString()}` },
-    { label: "Bonus", value: `${employee.currency} ${employee.bonus.toLocaleString()}` },
-    { label: "Last Updated", value: new Date(employee.updatedAt).toLocaleDateString() },
   ];
 
   return (
@@ -47,7 +55,7 @@ export default async function EmployeeDetailsPage({ params }: Props) {
         <Box
           sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 3 }}
         >
-          {fields.map(({ label, value }) => (
+          {readOnlyFields.map(({ label, value }) => (
             <Box key={label}>
               <Typography
                 variant="caption"
@@ -61,6 +69,19 @@ export default async function EmployeeDetailsPage({ params }: Props) {
               </Typography>
             </Box>
           ))}
+          <SalaryUpdateModal employee={employee} onUpdate={handleSalaryUpdate} />
+          <Box>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ textTransform: "uppercase", fontWeight: 600, letterSpacing: 0.5 }}
+            >
+              Last Updated
+            </Typography>
+            <Typography variant="body1" sx={{ mt: 0.5 }}>
+              {new Date(employee.updatedAt).toLocaleDateString()}
+            </Typography>
+          </Box>
         </Box>
       </Paper>
     </>
