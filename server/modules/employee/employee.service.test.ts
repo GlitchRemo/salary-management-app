@@ -37,10 +37,10 @@ describe("listEmployees", () => {
     const row = buildEmployeeRow({ baseSalary: 100000, bonus: 10000 });
     mockFindAllEmployees.mockResolvedValue([row]);
 
-    const result = await listEmployees();
+    const { employees } = await listEmployees();
 
-    expect(result).toHaveLength(1);
-    expect(result[0].totalCompensation).toBe(110000);
+    expect(employees).toHaveLength(1);
+    expect(employees[0].totalCompensation).toBe(110000);
   });
 
   it("calculates totalCompensation as baseSalary + bonus", async () => {
@@ -50,27 +50,27 @@ describe("listEmployees", () => {
     ];
     mockFindAllEmployees.mockResolvedValue(rows);
 
-    const result = await listEmployees();
+    const { employees } = await listEmployees();
 
-    expect(result[0].totalCompensation).toBe(50000);
-    expect(result[1].totalCompensation).toBe(100000);
+    expect(employees[0].totalCompensation).toBe(50000);
+    expect(employees[1].totalCompensation).toBe(100000);
   });
 
   it("preserves all original employee fields", async () => {
     const row = buildEmployeeRow();
     mockFindAllEmployees.mockResolvedValue([row]);
 
-    const result = await listEmployees();
+    const { employees } = await listEmployees();
 
-    expect(result[0]).toMatchObject(row);
+    expect(employees[0]).toMatchObject(row);
   });
 
-  it("returns an empty array when there are no employees", async () => {
+  it("returns empty employees array when there are no employees", async () => {
     mockFindAllEmployees.mockResolvedValue([]);
 
-    const result = await listEmployees();
+    const { employees } = await listEmployees();
 
-    expect(result).toEqual([]);
+    expect(employees).toEqual([]);
   });
 
   it("delegates to findAllEmployees", async () => {
@@ -90,16 +90,16 @@ describe("listEmployees", () => {
     expect(mockFindAllEmployees).toHaveBeenCalledWith(filters);
   });
 
-  it("returns all results when no search term is given", async () => {
+  it("returns all results on page 1 when no search term is given", async () => {
     const rows = [
       buildEmployeeRow({ id: "1", email: "a@acme.com", name: "Alice Smith" }),
       buildEmployeeRow({ id: "2", email: "b@acme.com", name: "Bob Jones" }),
     ];
     mockFindAllEmployees.mockResolvedValue(rows);
 
-    const result = await listEmployees({ country: Country.US });
+    const { employees } = await listEmployees({ country: Country.US });
 
-    expect(result).toHaveLength(2);
+    expect(employees).toHaveLength(2);
   });
 
   it("returns fuzzy-matched results when a search term is given", async () => {
@@ -109,21 +109,76 @@ describe("listEmployees", () => {
     ];
     mockFindAllEmployees.mockResolvedValue(rows);
 
-    const result = await listEmployees({ search: "Alice" });
+    const { employees } = await listEmployees({ search: "Alice" });
 
-    expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("Alice Smith");
+    expect(employees).toHaveLength(1);
+    expect(employees[0].name).toBe("Alice Smith");
   });
 
-  it("returns an empty array when no employees match the search term", async () => {
-    const rows = [
-      buildEmployeeRow({ id: "1", email: "a@acme.com", name: "Alice Smith" }),
-    ];
+  it("returns empty employees when no employees match the search term", async () => {
+    const rows = [buildEmployeeRow({ id: "1", email: "a@acme.com", name: "Alice Smith" })];
     mockFindAllEmployees.mockResolvedValue(rows);
 
-    const result = await listEmployees({ search: "Zebediah" });
+    const { employees } = await listEmployees({ search: "Zebediah" });
 
-    expect(result).toHaveLength(0);
+    expect(employees).toHaveLength(0);
+  });
+
+  it("returns the total count of all filtered results", async () => {
+    const rows = Array.from({ length: 30 }, (_, i) =>
+      buildEmployeeRow({ id: `emp_${i}`, email: `e${i}@acme.com` }),
+    );
+    mockFindAllEmployees.mockResolvedValue(rows);
+
+    const { total } = await listEmployees();
+
+    expect(total).toBe(30);
+  });
+
+  it("returns the correct page slice", async () => {
+    const rows = Array.from({ length: 30 }, (_, i) =>
+      buildEmployeeRow({ id: `emp_${i}`, email: `e${i}@acme.com`, name: `Employee ${String(i).padStart(2, "0")}` }),
+    );
+    mockFindAllEmployees.mockResolvedValue(rows);
+
+    const { employees } = await listEmployees({}, 2);
+
+    expect(employees).toHaveLength(5); // 30 total, 25 on page 1, 5 on page 2
+  });
+
+  it("returns totalPages based on DEFAULT_PAGE_SIZE", async () => {
+    const rows = Array.from({ length: 51 }, (_, i) =>
+      buildEmployeeRow({ id: `emp_${i}`, email: `e${i}@acme.com` }),
+    );
+    mockFindAllEmployees.mockResolvedValue(rows);
+
+    const { totalPages } = await listEmployees();
+
+    expect(totalPages).toBe(3);
+  });
+
+  it("clamps page to 1 when a page below 1 is given", async () => {
+    mockFindAllEmployees.mockResolvedValue([buildEmployeeRow()]);
+
+    const { page } = await listEmployees({}, 0);
+
+    expect(page).toBe(1);
+  });
+
+  it("clamps page to totalPages when the given page exceeds the total", async () => {
+    mockFindAllEmployees.mockResolvedValue([buildEmployeeRow()]);
+
+    const { page, totalPages } = await listEmployees({}, 99);
+
+    expect(page).toBe(totalPages);
+  });
+
+  it("returns totalPages of 1 when there are no results", async () => {
+    mockFindAllEmployees.mockResolvedValue([]);
+
+    const { totalPages } = await listEmployees();
+
+    expect(totalPages).toBe(1);
   });
 });
 

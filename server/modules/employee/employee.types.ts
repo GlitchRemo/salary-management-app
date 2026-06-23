@@ -32,3 +32,10 @@ export type EmployeeFilters = {
 export type ImportResult =
   | { success: true; imported: number }
   | { success: false; errors: string[] };
+
+export type PaginatedEmployees = {
+  employees: EmployeeListItem[];
+  total: number;
+  page: number;
+  totalPages: number;
+};

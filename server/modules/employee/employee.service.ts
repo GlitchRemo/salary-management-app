@@ -2,25 +2,37 @@ import Fuse from "fuse.js";
 import { findAllEmployees, findEmployeeById, upsertManyEmployees } from "./employee.repository";
 import { toEmployeeDto } from "./employee.mapper";
 import { parseCSV } from "@/server/modules/csv/csv-parser.service";
-import type { EmployeeListItem, EmployeeDto, EmployeeFilters, ImportResult } from "./employee.types";
+import { DEFAULT_PAGE_SIZE } from "@/server/constants";
+import type { EmployeeDto, EmployeeFilters, ImportResult, PaginatedEmployees } from "./employee.types";
 
 const FUSE_OPTIONS = {
   keys: ["name"],
   threshold: 0.4,
 };
 
-export async function listEmployees(filters: EmployeeFilters = {}): Promise<EmployeeListItem[]> {
-  const employees = await findAllEmployees(filters);
-  const withCompensation = employees.map((e) => ({
+export async function listEmployees(
+  filters: EmployeeFilters = {},
+  page = 1,
+): Promise<PaginatedEmployees> {
+  const rows = await findAllEmployees(filters);
+  const withCompensation = rows.map((e) => ({
     ...e,
     totalCompensation: e.baseSalary + e.bonus,
   }));
-  if (!filters.search) {
-    return withCompensation;
-  }
-  return new Fuse(withCompensation, FUSE_OPTIONS)
-    .search(filters.search)
-    .map((r) => r.item);
+
+  const filtered = filters.search
+    ? new Fuse(withCompensation, FUSE_OPTIONS)
+        .search(filters.search)
+        .map((r) => r.item)
+    : withCompensation;
+
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / DEFAULT_PAGE_SIZE));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const start = (safePage - 1) * DEFAULT_PAGE_SIZE;
+  const employees = filtered.slice(start, start + DEFAULT_PAGE_SIZE);
+
+  return { employees, total, page: safePage, totalPages };
 }
 
 export async function getEmployee(id: string): Promise<EmployeeDto | null> {

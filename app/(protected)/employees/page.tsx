@@ -6,6 +6,7 @@ import type { EmployeeFilters, ImportResult } from "@/server/modules/employee/em
 import { SearchBar } from "@/components/molecules/SearchBar";
 import { EnumFilterSelect } from "@/components/atoms/EnumFilterSelect";
 import { CsvUpload } from "@/components/organisms/CsvUpload";
+import { PaginationControls } from "@/components/molecules/PaginationControls";
 import { COUNTRY_OPTIONS, DEPARTMENT_OPTIONS } from "@/app/constants";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -21,21 +22,22 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 export default async function EmployeesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; country?: string; department?: string }>;
+  searchParams: Promise<{ search?: string; country?: string; department?: string; page?: string }>;
 }) {
-  const { search, country: countryParam, department: departmentParam } = await searchParams;
+  const { search, country: countryParam, department: departmentParam, page: pageParam } = await searchParams;
   const country = countryParam && (Object.values(Country) as string[]).includes(countryParam)
     ? (countryParam as Country)
     : undefined;
   const department = departmentParam && (Object.values(Department) as string[]).includes(departmentParam)
     ? (departmentParam as Department)
     : undefined;
+  const page = pageParam ? Math.max(1, parseInt(pageParam, 10) || 1) : 1;
   const filters: EmployeeFilters = {
     ...(search && { search }),
     ...(country && { country }),
     ...(department && { department }),
   };
-  const employees = await listEmployees(filters);
+  const { employees, totalPages, page: currentPage } = await listEmployees(filters, page);
 
   async function handleCsvImport(formData: FormData): Promise<ImportResult> {
     "use server";
@@ -127,6 +129,7 @@ export default async function EmployeesPage({
           </Typography>
         )}
       </Paper>
+      <PaginationControls totalPages={totalPages} currentPage={currentPage} />
     </>
   );
 }
