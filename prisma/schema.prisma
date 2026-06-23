@@ -7,6 +7,29 @@ datasource db {
   provider = "sqlite"
 }
 
+enum Country {
+  US
+  DE
+  GB
+  BR
+  IN
+}
+
+enum Department {
+  Engineering
+  Product
+  Finance
+  Design
+}
+
+enum Currency {
+  USD
+  EUR
+  GBP
+  BRL
+  INR
+}
+
 model HRUser {
   id           String        @id @default(cuid())
   email        String        @unique
@@ -17,16 +40,16 @@ model HRUser {
 }
 
 model Employee {
-  id         String   @id @default(cuid())
+  id         String     @id @default(cuid())
   name       String
-  email      String   @unique
-  department String
-  country    String
-  currency   String
+  email      String     @unique
+  department Department
+  country    Country
+  currency   Currency
   baseSalary Float
-  bonus      Float    @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  bonus      Float      @default(0)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   salaryAudits SalaryAudit[]
 

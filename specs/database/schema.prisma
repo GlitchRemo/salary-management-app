@@ -3,12 +3,41 @@
 // Database: SQLite
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// Enums
+// SQLite has no native enum type — Prisma stores as TEXT and enforces values
+// at the application/ORM layer. Adding a new value requires a schema + code change.
+// ─────────────────────────────────────────────
+
+enum Country {
+  US
+  DE
+  GB
+  BR
+  IN
+}
+
+enum Department {
+  Engineering
+  Product
+  Finance
+  Design
+}
+
+enum Currency {
+  USD
+  EUR
+  GBP
+  BRL
+  INR
 }
 
 // ─────────────────────────────────────────────

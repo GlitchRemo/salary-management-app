@@ -2,6 +2,7 @@ import "dotenv/config";
 import path from "path";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "../app/generated/prisma/client";
+import { Country, Department, Currency } from "../app/generated/prisma/enums";
 import { createHash } from "crypto";
 
 const rawUrl = process.env.DATABASE_URL ?? "file:./dev.db";
@@ -30,47 +31,56 @@ async function main() {
     {
       name: "Alice Johnson",
       email: "alice@acme.com",
-      department: "Engineering",
-      country: "US",
-      currency: "USD",
+      department: Department.Engineering,
+      country: Country.US,
+      currency: Currency.USD,
       baseSalary: 120000,
       bonus: 15000,
     },
     {
       name: "Bob Smith",
       email: "bob@acme.com",
-      department: "Product",
-      country: "US",
-      currency: "USD",
+      department: Department.Product,
+      country: Country.US,
+      currency: Currency.USD,
       baseSalary: 110000,
       bonus: 10000,
     },
     {
       name: "Clara Müller",
       email: "clara@acme.com",
-      department: "Engineering",
-      country: "DE",
-      currency: "EUR",
+      department: Department.Engineering,
+      country: Country.DE,
+      currency: Currency.EUR,
       baseSalary: 95000,
       bonus: 8000,
     },
     {
       name: "David Okonkwo",
       email: "david@acme.com",
-      department: "Finance",
-      country: "GB",
-      currency: "GBP",
+      department: Department.Finance,
+      country: Country.GB,
+      currency: Currency.GBP,
       baseSalary: 85000,
       bonus: 7500,
     },
     {
       name: "Eva Santos",
       email: "eva@acme.com",
-      department: "Design",
-      country: "BR",
-      currency: "BRL",
+      department: Department.Design,
+      country: Country.BR,
+      currency: Currency.BRL,
       baseSalary: 72000,
       bonus: 5000,
+    },
+    {
+      name: "Priya Sharma",
+      email: "priya@acme.com",
+      department: Department.Engineering,
+      country: Country.IN,
+      currency: Currency.INR,
+      baseSalary: 2800000,
+      bonus: 280000,
     },
   ];
 

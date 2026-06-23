@@ -4,6 +4,24 @@ This file records significant specification or architectural decisions made with
 
 ---
 
+## 2026-06-24 — Country, Department, and Currency represented as Prisma enums
+
+**Cause**
+
+`country`, `department`, and `currency` on the `Employee` model were plain `String` fields. This allowed any arbitrary value to be stored, making filtering unreliable and giving no compile-time safety over the valid value sets.
+
+**Decision**
+
+* Introduce `Country`, `Department`, and `Currency` enums in `prisma/schema.prisma`.
+* Valid countries: US, DE, GB, BR, IN.
+* Valid departments: Engineering, Product, Finance, Design.
+* Valid currencies: USD, EUR, GBP, BRL, INR.
+* `EmployeeFilters.country` and `EmployeeFilters.department` are now typed with the Prisma-generated enum union types, enforcing correctness at the service boundary.
+* SQLite has no native enum type — Prisma stores values as TEXT and validates at the ORM layer. No migration SQL was required; only `prisma generate` was needed to emit the TypeScript types.
+* Adding a new country, department, or currency requires a schema change, `prisma generate`, and a deploy. This is intentional — values are controlled and reviewed.
+
+---
+
 ## 2026-06-23 — Removed Server Actions; pages call service functions directly
 
 **Cause**
