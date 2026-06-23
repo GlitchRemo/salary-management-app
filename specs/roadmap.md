@@ -121,13 +121,8 @@ Features
 * ✅ Deploy application to Render (via `render.yaml` Blueprint)
 * ✅ Deploy database (SQLite on Render persistent disk at `/data/dev.db`, 1 GB)
 * ✅ Configure environment variables (`DATABASE_URL`, `NODE_ENV` defined in `render.yaml`)
-* ✅ Migrations run automatically on every deploy (`prisma migrate deploy` in start command)
-* ⬜ Obtain publicly accessible URL (pending first deploy)
-
-Commits
-
-1. chore: add render.yaml with web service and persistent disk
-2. docs: add deployment instructions to README
+* ✅ Migrations run automatically on every deploy (`prisma migrate deploy` in build command, before Next.js build)
+* ✅ Obtain publicly accessible URL — https://salary-management-app-k786.onrender.com
 
 Definition of Done
 

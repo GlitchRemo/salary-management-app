@@ -1,4 +1,5 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+**Live app:** https://salary-management-app-k786.onrender.com
+
 
 ## Local Setup
 
@@ -41,7 +42,7 @@ This creates the SQLite database at `dev.db` and applies all migrations.
 pnpm tsx prisma/seed.ts
 ```
 
-This inserts 1 sample HR user, 10 employees, and audit records. The script uses `upsert` for HR user and employees, so it is safe to run multiple times without creating duplicates.
+This inserts 1 sample HR user, 5 employees, and audit records. The script uses `upsert` for HR user and employees, so it is safe to run multiple times without creating duplicates.
 
 ### 5. Start the development server
 
