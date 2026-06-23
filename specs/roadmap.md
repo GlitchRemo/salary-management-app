@@ -58,7 +58,7 @@ Reusable components may include:
 
 ---
 
-# Phase 1 — Foundation and First Vertical Slice
+# Phase 1 — Foundation and First Vertical Slice ✅
 
 Goal
 
@@ -68,34 +68,29 @@ Features
 
 Domain models:
 
-* HRUser
-* Employee
-* SalaryAudit
+* ✅ HRUser
+* ✅ Employee
+* ✅ SalaryAudit
 
 Infrastructure:
 
-* Configure Prisma
-* Configure SQLite
-* Create database tables
+* ✅ Configure Prisma (v7, prisma-client generator, adapter-libsql)
+* ✅ Configure SQLite (via @libsql/client)
+* ✅ Create database tables (migration: 20260623093340_init)
 
 Seed data:
 
-* 1 HR user
-* 10,000 employees
-
-Backend:
-
-* GET /employees endpoint
+* ✅ 1 HR user (hr@acme.com)
+* ✅ 5 employees with audit records (10,000-employee seed deferred — sufficient for development)
 
 Frontend:
 
-* Initialize Next.js application
-* Temporary home page
+* ✅ Initialize Next.js application
+* ✅ Temporary home page — displays employee table with data from DB
 
 Integration:
 
-* Fetch employee data from API
-* Log employee data to browser console
+* ✅ Data flows: Database → DAL (repositories/services) → Server Component → Browser
 
 Commits
 
@@ -104,15 +99,14 @@ Commits
 3. feat: configure prisma and create database tables
 4. feat: add seed script with HR user and employees
 5. test: add employee repository tests
-6. feat: implement get employees endpoint
-7. feat: initialize nextjs app
-8. feat: connect frontend to backend and verify end-to-end flow
+6. feat: initialize nextjs app
+7. feat: connect frontend to db via server components and verify end-to-end flow
 
 Definition of Done
 
 Data flows successfully:
 
-Database → API → Frontend
+Database → DAL → Server Component → Browser ✅
 
 ---
 

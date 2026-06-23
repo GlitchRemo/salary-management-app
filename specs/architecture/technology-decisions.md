@@ -19,14 +19,16 @@ Chosen because:
 * Improves readability and refactoring confidence.
 * Required for maintainable codebases at this scale.
 
-### Material UI
+### Tailwind CSS
 
-Chosen because:
+Chosen (replaces Material UI, decision 2026-06-23) because:
 
-* Comprehensive component library covering all required UI patterns.
-* Eliminates the need for custom styling from scratch.
-* DataGrid handles complex employee tables out of the box.
-* Consistent design system with minimal effort.
+* Ships with the Next.js boilerplate — zero extra setup.
+* Utility-first approach is faster for building custom layouts.
+* No JavaScript bundle cost (pure CSS).
+* Sufficient for an internal tool that does not need a pre-built component catalogue.
+
+Material UI was originally planned but deferred. It may be reintroduced if a richer component library (e.g. DataGrid for the employee table) becomes worthwhile.
 
 ---
 
