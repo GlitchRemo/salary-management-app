@@ -30,10 +30,11 @@ export async function findEmployeeById(id: string): Promise<Employee | null> {
   return prisma.employee.findUnique({ where: { id } });
 }
 
-export async function upsertManyEmployees(rows: CsvRow[]): Promise<number> {
-  await prisma.$transaction(
-    rows.map((row) =>
-      prisma.employee.upsert({
+export async function upsertManyEmployees(rows: CsvRow[], changedById: string): Promise<number> {
+  await prisma.$transaction(async (tx) => {
+    for (const row of rows) {
+      const existing = await tx.employee.findUnique({ where: { id: row.employeeId } });
+      await tx.employee.upsert({
         where: { id: row.employeeId },
         update: {
           name: `${row.firstName} ${row.lastName}`,
@@ -54,8 +55,20 @@ export async function upsertManyEmployees(rows: CsvRow[]): Promise<number> {
           baseSalary: row.baseSalary,
           bonus: row.bonus,
         },
-      })
-    )
-  );
+      });
+      if (existing !== null) {
+        await tx.salaryAudit.create({
+          data: {
+            employeeId: row.employeeId,
+            changedById,
+            previousBaseSalary: existing.baseSalary,
+            newBaseSalary: row.baseSalary,
+            previousBonus: existing.bonus,
+            newBonus: row.bonus,
+          },
+        });
+      }
+    }
+  });
   return rows.length;
 }

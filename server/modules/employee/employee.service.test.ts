@@ -228,10 +228,12 @@ describe("getEmployee", () => {
 // ---------------------------------------------------------------------------
 
 describe("importEmployees", () => {
+  const CHANGER_ID = "hr_test";
+
   it("returns failure when the CSV is invalid", async () => {
     mockParseCSV.mockReturnValue({ success: false, errors: ["Row 2: email must be a valid email address"] });
 
-    const result = await importEmployees("bad csv");
+    const result = await importEmployees("bad csv", CHANGER_ID);
 
     expect(result.success).toBe(false);
     if (result.success) return;
@@ -244,28 +246,28 @@ describe("importEmployees", () => {
     mockParseCSV.mockReturnValue({ success: true, rows });
     mockUpsertManyEmployees.mockResolvedValue(2);
 
-    const result = await importEmployees("valid csv");
+    const result = await importEmployees("valid csv", CHANGER_ID);
 
     expect(result.success).toBe(true);
     if (!result.success) return;
     expect(result.imported).toBe(2);
   });
 
-  it("passes the parsed rows to upsertManyEmployees", async () => {
+  it("passes the parsed rows and changedById to upsertManyEmployees", async () => {
     const rows = [buildCsvRow()];
     mockParseCSV.mockReturnValue({ success: true, rows });
     mockUpsertManyEmployees.mockResolvedValue(1);
 
-    await importEmployees("valid csv");
+    await importEmployees("valid csv", CHANGER_ID);
 
-    expect(mockUpsertManyEmployees).toHaveBeenCalledWith(rows);
+    expect(mockUpsertManyEmployees).toHaveBeenCalledWith(rows, CHANGER_ID);
   });
 
   it("returns success with 0 imported for an empty CSV", async () => {
     mockParseCSV.mockReturnValue({ success: true, rows: [] });
     mockUpsertManyEmployees.mockResolvedValue(0);
 
-    const result = await importEmployees("header only");
+    const result = await importEmployees("header only", CHANGER_ID);
 
     expect(result.success).toBe(true);
     if (!result.success) return;

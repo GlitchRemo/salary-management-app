@@ -41,11 +41,11 @@ export async function getEmployee(id: string): Promise<EmployeeDto | null> {
   return toEmployeeDto(employee);
 }
 
-export async function importEmployees(csvContent: string): Promise<ImportResult> {
+export async function importEmployees(csvContent: string, changedById: string): Promise<ImportResult> {
   const parseResult = parseCSV(csvContent);
   if (!parseResult.success) {
     return { success: false, errors: parseResult.errors };
   }
-  const imported = await upsertManyEmployees(parseResult.rows);
+  const imported = await upsertManyEmployees(parseResult.rows, changedById);
   return { success: true, imported };
 }

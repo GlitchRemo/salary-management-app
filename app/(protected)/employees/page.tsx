@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { listEmployees, importEmployees } from "@/server/modules/employee/employee.service";
+import { findFirstHrUserId } from "@/server/modules/hr-user/hr-user.repository";
 import { Country, Department } from "@/app/generated/prisma/enums";
 import type { EmployeeFilters, ImportResult } from "@/server/modules/employee/employee.types";
 import { SearchBar } from "@/components/molecules/SearchBar";
@@ -8,6 +9,7 @@ import { EnumFilterSelect } from "@/components/atoms/EnumFilterSelect";
 import { CsvUpload } from "@/components/organisms/CsvUpload";
 import { PaginationControls } from "@/components/molecules/PaginationControls";
 import { COUNTRY_OPTIONS, DEPARTMENT_OPTIONS } from "@/app/constants";
+import { formatSalary } from "@/lib/formatSalary";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Table from "@mui/material/Table";
@@ -46,7 +48,8 @@ export default async function EmployeesPage({
       return { success: false, errors: ["Please select a CSV file"] };
     }
     const csvContent = await file.text();
-    const result = await importEmployees(csvContent);
+    const changedById = (await findFirstHrUserId()) ?? "system";
+    const result = await importEmployees(csvContent, changedById);
     if (result.success) {
       revalidatePath("/employees");
     }
@@ -101,13 +104,13 @@ export default async function EmployeesPage({
                   <TableCell>{emp.department}</TableCell>
                   <TableCell>{emp.country}</TableCell>
                   <TableCell align="right">
-                    {emp.currency} {emp.baseSalary.toLocaleString()}
+                    {emp.currency} {formatSalary(emp.baseSalary, emp.currency)}
                   </TableCell>
                   <TableCell align="right">
-                    {emp.currency} {emp.bonus.toLocaleString()}
+                    {emp.currency} {formatSalary(emp.bonus, emp.currency)}
                   </TableCell>
                   <TableCell align="right" sx={{ fontWeight: 600 }}>
-                    {emp.currency} {emp.totalCompensation.toLocaleString()}
+                    {emp.currency} {formatSalary(emp.totalCompensation, emp.currency)}
                   </TableCell>
                   <TableCell align="right" sx={{ width: 48, pr: 1 }}>
                     <Link

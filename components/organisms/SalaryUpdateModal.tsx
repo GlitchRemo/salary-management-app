@@ -15,6 +15,7 @@ import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
 import type { SalaryUpdateModalProps } from "./SalaryUpdateModal.interface";
 import type { EditField } from "./SalaryUpdateModal.types";
+import { formatSalary } from "@/lib/formatSalary";
 
 const CAPTION_SX = {
   textTransform: "uppercase" as const,
@@ -84,7 +85,7 @@ export function SalaryUpdateModal({ employee, onUpdate }: SalaryUpdateModalProps
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}>
           <Typography variant="body1">
-            {employee.currency} {employee.baseSalary.toLocaleString()}
+            {employee.currency} {formatSalary(employee.baseSalary, employee.currency)}
           </Typography>
           <IconButton size="small" onClick={() => handleOpen("baseSalary")} aria-label="Edit base salary">
             <EditIcon sx={{ fontSize: 16 }} />
@@ -98,7 +99,7 @@ export function SalaryUpdateModal({ employee, onUpdate }: SalaryUpdateModalProps
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}>
           <Typography variant="body1">
-            {employee.currency} {employee.bonus.toLocaleString()}
+            {employee.currency} {formatSalary(employee.bonus, employee.currency)}
           </Typography>
           <IconButton size="small" onClick={() => handleOpen("bonus")} aria-label="Edit bonus">
             <EditIcon sx={{ fontSize: 16 }} />

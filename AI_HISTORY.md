@@ -96,3 +96,22 @@ Migrate the database from SQLite to PostgreSQL, hosted via Vercel Postgres (powe
 * No schema model changes were required — Prisma abstracts the provider difference.
 * The `DATABASE_URL` environment variable pattern is unchanged; the value will point to a PostgreSQL connection string instead of a file path.
 * A separate `DATABASE_TEST_URL` env var is introduced for the E2E test database.
+
+---
+
+## 2026-06-24 — CSV bulk import only audits salary changes, not new employee creates
+
+**Cause**
+
+During bulk CSV import via `upsertManyEmployees`, the initial implementation created a `SalaryAudit` record for every row — including brand-new employees where there is no meaningful "previous" salary to track. Using sentinel values (e.g. `previousBaseSalary: 0`) is misleading and adds noise to the audit trail.
+
+**Decision**
+
+* `upsertManyEmployees` only creates a `SalaryAudit` record when the employee already exists in the database (i.e. the row resolves to an `UPDATE`).
+* New employee rows (resolved as `INSERT`) are silently skipped from auditing — the initial salary is considered the ground truth, not a change.
+* `changedById` is still required by the function because a mixed CSV (some new, some existing) requires it for the update rows.
+
+**Notes**
+
+* This aligns with the intent of the audit trail: to track *changes* to compensation, not initial data entry.
+* The `findUnique` call per row is still necessary to distinguish creates from updates and to capture the previous salary values for the audit record.

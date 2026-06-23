@@ -8,6 +8,10 @@ vi.mock("@/server/modules/employee/employee.service", () => ({
   importEmployees: vi.fn(),
 }));
 
+vi.mock("@/server/modules/hr-user/hr-user.repository", () => ({
+  findFirstHrUserId: vi.fn().mockResolvedValue("hr_test"),
+}));
+
 vi.mock("@/components/molecules/SearchBar", () => ({
   SearchBar: () => null,
 }));
