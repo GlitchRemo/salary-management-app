@@ -6,13 +6,21 @@ vi.mock("@/server/modules/employee/employee.service", () => ({
   listEmployees: vi.fn(),
 }));
 
+vi.mock("@/components/molecules/SearchBar", () => ({
+  SearchBar: () => null,
+}));
+
 import { listEmployees } from "@/server/modules/employee/employee.service";
 import EmployeesPage from "@/app/(protected)/employees/page";
+
+function makeSearchParams(params: { search?: string } = {}): Promise<{ search?: string }> {
+  return Promise.resolve(params);
+}
 
 describe("EmployeesPage", () => {
   it("renders the page heading", async () => {
     vi.mocked(listEmployees).mockResolvedValue([]);
-    render(await EmployeesPage());
+    render(await EmployeesPage({ searchParams: makeSearchParams() }));
     expect(screen.getByRole("heading", { name: /employees/i })).toBeInTheDocument();
   });
 
@@ -21,14 +29,14 @@ describe("EmployeesPage", () => {
       buildEmployeeListItem({ id: "emp_1", name: "Jane Smith" }),
       buildEmployeeListItem({ id: "emp_2", name: "John Doe", email: "john.doe@acme.com" }),
     ]);
-    render(await EmployeesPage());
+    render(await EmployeesPage({ searchParams: makeSearchParams() }));
     expect(screen.getByText("Jane Smith")).toBeInTheDocument();
     expect(screen.getByText("John Doe")).toBeInTheDocument();
   });
 
   it("renders column headers", async () => {
     vi.mocked(listEmployees).mockResolvedValue([]);
-    render(await EmployeesPage());
+    render(await EmployeesPage({ searchParams: makeSearchParams() }));
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Department")).toBeInTheDocument();
     expect(screen.getByText("Base Salary")).toBeInTheDocument();
@@ -37,7 +45,7 @@ describe("EmployeesPage", () => {
 
   it("renders the empty state when there are no employees", async () => {
     vi.mocked(listEmployees).mockResolvedValue([]);
-    render(await EmployeesPage());
+    render(await EmployeesPage({ searchParams: makeSearchParams() }));
     expect(screen.getByText(/no employees found/i)).toBeInTheDocument();
   });
 
@@ -45,7 +53,7 @@ describe("EmployeesPage", () => {
     vi.mocked(listEmployees).mockResolvedValue([
       buildEmployeeListItem({ currency: "USD", baseSalary: 80000, bonus: 5000, totalCompensation: 85000 }),
     ]);
-    render(await EmployeesPage());
+    render(await EmployeesPage({ searchParams: makeSearchParams() }));
     expect(screen.getByText("USD 85,000")).toBeInTheDocument();
   });
 
@@ -54,7 +62,7 @@ describe("EmployeesPage", () => {
       buildEmployeeListItem({ id: "emp_1", name: "Jane Smith" }),
       buildEmployeeListItem({ id: "emp_2", name: "John Doe" }),
     ]);
-    render(await EmployeesPage());
+    render(await EmployeesPage({ searchParams: makeSearchParams() }));
     expect(screen.getByRole("link", { name: /view details for jane smith/i })).toHaveAttribute(
       "href",
       "/employees/emp_1",
@@ -63,5 +71,17 @@ describe("EmployeesPage", () => {
       "href",
       "/employees/emp_2",
     );
+  });
+
+  it("passes the search param to listEmployees", async () => {
+    vi.mocked(listEmployees).mockResolvedValue([]);
+    await EmployeesPage({ searchParams: makeSearchParams({ search: "Alice" }) });
+    expect(listEmployees).toHaveBeenCalledWith({ search: "Alice" });
+  });
+
+  it("calls listEmployees with empty filters when no search param is present", async () => {
+    vi.mocked(listEmployees).mockResolvedValue([]);
+    await EmployeesPage({ searchParams: makeSearchParams() });
+    expect(listEmployees).toHaveBeenCalledWith({});
   });
 });

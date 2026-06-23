@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listEmployees } from "@/server/modules/employee/employee.service";
+import { SearchBar } from "@/components/molecules/SearchBar";
 import Typography from "@mui/material/Typography";
 import Table from "@mui/material/Table";
 import TableHead from "@mui/material/TableHead";
@@ -10,14 +11,20 @@ import Paper from "@mui/material/Paper";
 import TableContainer from "@mui/material/TableContainer";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
-export default async function EmployeesPage() {
-  const employees = await listEmployees();
+export default async function EmployeesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string }>;
+}) {
+  const { search } = await searchParams;
+  const employees = await listEmployees(search ? { search } : {});
 
   return (
     <>
       <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
         Employees
       </Typography>
+      <SearchBar />
       <Paper elevation={0} variant="outlined" sx={{ borderRadius: 2, overflow: "hidden" }}>
         <TableContainer>
           <Table size="small">
