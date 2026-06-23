@@ -11,3 +11,10 @@ export type SalaryAuditInput = {
   previousBonus: number;
   newBonus: number;
 };
+
+export type SalaryUpdateParams = {
+  employeeId: string;
+  baseSalary: number;
+  bonus: number;
+  changedById: string;
+};

@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import type { EmployeeListItem } from "@/server/services/employee.types";
+import type { EmployeeListItem } from "@/server/modules/employee/employee.types";
 
-vi.mock("@/server/services/employee.service", () => ({
+vi.mock("@/server/modules/employee/employee.service", () => ({
   listEmployees: vi.fn(),
 }));
 
-import { listEmployees } from "@/server/services/employee.service";
+import { listEmployees } from "@/server/modules/employee/employee.service";
 import EmployeesPage from "@/app/(protected)/employees/page";
 
 function buildEmployee(overrides: Partial<EmployeeListItem> = {}): EmployeeListItem {

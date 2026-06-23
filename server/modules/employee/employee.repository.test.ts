@@ -15,7 +15,7 @@ import { prisma } from "@/server/db/client";
 import {
   findAllEmployees,
   findEmployeeById,
-} from "@/server/repositories/employee.repository";
+} from "./employee.repository";
 
 // ---------------------------------------------------------------------------
 // Test factory

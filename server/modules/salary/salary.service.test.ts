@@ -1,18 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Employee, SalaryAudit } from "@/app/generated/prisma/client";
 
-vi.mock("@/server/repositories/employee.repository", () => ({
+vi.mock("../employee/employee.repository", () => ({
   findEmployeeById: vi.fn(),
 }));
 
-vi.mock("@/server/repositories/salary.repository", () => ({
+vi.mock("./salary.repository", () => ({
   updateEmployeeSalary: vi.fn(),
   createSalaryAudit: vi.fn(),
 }));
 
-import { findEmployeeById } from "@/server/repositories/employee.repository";
-import { updateEmployeeSalary, createSalaryAudit } from "@/server/repositories/salary.repository";
-import { updateSalary } from "@/server/services/salary.service";
+import { findEmployeeById } from "../employee/employee.repository";
+import { updateEmployeeSalary, createSalaryAudit } from "./salary.repository";
+import { updateSalary } from "./salary.service";
 import { ValidationError, NotFoundError } from "@/server/errors";
 
 function buildEmployee(overrides: Partial<Employee> = {}): Employee {

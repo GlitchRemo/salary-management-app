@@ -1,8 +1,8 @@
 import { prisma } from "@/server/db/client";
 import type { Employee, SalaryAudit } from "@/app/generated/prisma/client";
-import type { SalaryUpdateInput, SalaryAuditInput } from "@/server/repositories/salary.types";
+import type { SalaryUpdateInput, SalaryAuditInput } from "./salary.types";
 
-export type { SalaryUpdateInput, SalaryAuditInput } from "@/server/repositories/salary.types";
+export type { SalaryUpdateInput, SalaryAuditInput } from "./salary.types";
 
 export async function updateEmployeeSalary(
   id: string,

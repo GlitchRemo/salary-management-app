@@ -1,14 +1,14 @@
 import type { Employee } from "@/app/generated/prisma/client";
-import { findEmployeeById } from "@/server/repositories/employee.repository";
+import { findEmployeeById } from "../employee/employee.repository";
 import {
   updateEmployeeSalary,
   createSalaryAudit,
-} from "@/server/repositories/salary.repository";
+} from "./salary.repository";
 import { ValidationError, NotFoundError } from "@/server/errors";
 import { ERROR_MESSAGES } from "@/server/constants";
-import type { SalaryUpdateParams } from "@/server/services/salary.types";
+import type { SalaryUpdateParams } from "./salary.types";
 
-export type { SalaryUpdateParams } from "@/server/services/salary.types";
+export type { SalaryUpdateParams } from "./salary.types";
 
 export async function updateSalary(params: SalaryUpdateParams): Promise<Employee> {
   const { employeeId, baseSalary, bonus, changedById } = params;

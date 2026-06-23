@@ -4,3 +4,7 @@ export type EmployeeRow = Pick<
   Employee,
   "id" | "name" | "email" | "department" | "country" | "currency" | "baseSalary" | "bonus"
 >;
+
+export type EmployeeListItem = EmployeeRow & {
+  totalCompensation: number;
+};
