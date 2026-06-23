@@ -122,7 +122,7 @@ Returns full details of a single employee.
 
 ---
 
-### PATCH /api/employees/:id
+### PATCH /api/employees/:id/salary
 
 Updates an employee's salary fields.
 

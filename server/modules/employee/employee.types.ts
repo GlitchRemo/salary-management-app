@@ -8,3 +8,16 @@ export type EmployeeRow = Pick<
 export type EmployeeListItem = EmployeeRow & {
   totalCompensation: number;
 };
+
+export type EmployeeDto = {
+  id: string;
+  name: string;
+  email: string;
+  department: string;
+  country: string;
+  currency: string;
+  baseSalary: number;
+  bonus: number;
+  createdAt: string;
+  updatedAt: string;
+};
