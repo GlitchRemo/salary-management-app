@@ -1,9 +1,8 @@
 import Fuse from "fuse.js";
-import { findAllEmployees, findEmployeeById } from "./employee.repository";
+import { findAllEmployees, findEmployeeById, upsertManyEmployees } from "./employee.repository";
 import { toEmployeeDto } from "./employee.mapper";
-import type { EmployeeListItem, EmployeeDto, EmployeeFilters } from "./employee.types";
-
-export type { EmployeeListItem, EmployeeDto, EmployeeFilters } from "./employee.types";
+import { parseCSV } from "@/server/modules/csv/csv-parser.service";
+import type { EmployeeListItem, EmployeeDto, EmployeeFilters, ImportResult } from "./employee.types";
 
 const FUSE_OPTIONS = {
   keys: ["name"],
@@ -28,4 +27,13 @@ export async function getEmployee(id: string): Promise<EmployeeDto | null> {
   const employee = await findEmployeeById(id);
   if (!employee) return null;
   return toEmployeeDto(employee);
+}
+
+export async function importEmployees(csvContent: string): Promise<ImportResult> {
+  const parseResult = parseCSV(csvContent);
+  if (!parseResult.success) {
+    return { success: false, errors: parseResult.errors };
+  }
+  const imported = await upsertManyEmployees(parseResult.rows);
+  return { success: true, imported };
 }

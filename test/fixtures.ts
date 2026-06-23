@@ -1,6 +1,7 @@
 import type { Employee, SalaryAudit, HRUser } from "@/app/generated/prisma/client";
 import { Country, Department, Currency } from "@/app/generated/prisma/enums";
 import type { EmployeeDto, EmployeeRow, EmployeeListItem } from "@/server/modules/employee/employee.types";
+import type { CsvRow } from "@/server/modules/csv/csv-parser.types";
 
 export function buildEmployee(overrides: Partial<Employee> = {}): Employee {
   return {
@@ -85,6 +86,21 @@ export function buildHrUser(overrides: Partial<HRUser> = {}): HRUser {
     email: "hr@acme.com",
     passwordHash: "hashed",
     createdAt: new Date("2024-01-01T00:00:00Z"),
+    ...overrides,
+  };
+}
+
+export function buildCsvRow(overrides: Partial<CsvRow> = {}): CsvRow {
+  return {
+    employeeId: "emp_1",
+    firstName: "Jane",
+    lastName: "Smith",
+    email: "jane.smith@acme.com",
+    department: Department.Engineering,
+    country: Country.US,
+    currency: Currency.USD,
+    baseSalary: 80000,
+    bonus: 5000,
     ...overrides,
   };
 }

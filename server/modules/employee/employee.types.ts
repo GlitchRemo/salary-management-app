@@ -28,3 +28,7 @@ export type EmployeeFilters = {
   country?: Country;
   department?: Department;
 };
+
+export type ImportResult =
+  | { success: true; imported: number }
+  | { success: false; errors: string[] };

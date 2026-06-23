@@ -1,20 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { buildEmployee, buildEmployeeRow } from "@/test/fixtures";
+import { buildEmployee, buildEmployeeRow, buildCsvRow } from "@/test/fixtures";
 import { Country, Department } from "@/app/generated/prisma/enums";
 
 // --- mock the repository before importing the service ---
 vi.mock("./employee.repository", () => ({
   findAllEmployees: vi.fn(),
   findEmployeeById: vi.fn(),
+  upsertManyEmployees: vi.fn(),
 }));
 
-import { findAllEmployees, findEmployeeById } from "./employee.repository";
-import { listEmployees, getEmployee } from "./employee.service";
+vi.mock("@/server/modules/csv/csv-parser.service", () => ({
+  parseCSV: vi.fn(),
+}));
+
+import { findAllEmployees, findEmployeeById, upsertManyEmployees } from "./employee.repository";
+import { parseCSV } from "@/server/modules/csv/csv-parser.service";
+import { listEmployees, getEmployee, importEmployees } from "./employee.service";
 
 // ---------------------------------------------------------------------------
 
 const mockFindAllEmployees = vi.mocked(findAllEmployees);
 const mockFindEmployeeById = vi.mocked(findEmployeeById);
+const mockUpsertManyEmployees = vi.mocked(upsertManyEmployees);
+const mockParseCSV = vi.mocked(parseCSV);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -157,5 +165,55 @@ describe("getEmployee", () => {
     const result = await getEmployee("emp_1");
 
     expect(result?.updatedAt).toBe(date.toISOString());
+  });
+});
+
+// ---------------------------------------------------------------------------
+// importEmployees
+// ---------------------------------------------------------------------------
+
+describe("importEmployees", () => {
+  it("returns failure when the CSV is invalid", async () => {
+    mockParseCSV.mockReturnValue({ success: false, errors: ["Row 2: email must be a valid email address"] });
+
+    const result = await importEmployees("bad csv");
+
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    expect(result.errors).toEqual(["Row 2: email must be a valid email address"]);
+    expect(mockUpsertManyEmployees).not.toHaveBeenCalled();
+  });
+
+  it("returns success with imported count when the CSV is valid", async () => {
+    const rows = [buildCsvRow(), buildCsvRow({ employeeId: "emp_2", email: "b@acme.com" })];
+    mockParseCSV.mockReturnValue({ success: true, rows });
+    mockUpsertManyEmployees.mockResolvedValue(2);
+
+    const result = await importEmployees("valid csv");
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.imported).toBe(2);
+  });
+
+  it("passes the parsed rows to upsertManyEmployees", async () => {
+    const rows = [buildCsvRow()];
+    mockParseCSV.mockReturnValue({ success: true, rows });
+    mockUpsertManyEmployees.mockResolvedValue(1);
+
+    await importEmployees("valid csv");
+
+    expect(mockUpsertManyEmployees).toHaveBeenCalledWith(rows);
+  });
+
+  it("returns success with 0 imported for an empty CSV", async () => {
+    mockParseCSV.mockReturnValue({ success: true, rows: [] });
+    mockUpsertManyEmployees.mockResolvedValue(0);
+
+    const result = await importEmployees("header only");
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.imported).toBe(0);
   });
 });

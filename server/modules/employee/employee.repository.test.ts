@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { buildEmployee } from "@/test/fixtures";
+import { buildEmployee, buildCsvRow } from "@/test/fixtures";
 import { Country, Department } from "@/app/generated/prisma/enums";
 
 // --- mock the prisma singleton before importing the module under test ---
@@ -8,7 +8,9 @@ vi.mock("@/server/db/client", () => ({
     employee: {
       findMany: vi.fn(),
       findUnique: vi.fn(),
+      upsert: vi.fn(),
     },
+    $transaction: vi.fn(),
   },
 }));
 
@@ -16,12 +18,15 @@ import { prisma } from "@/server/db/client";
 import {
   findAllEmployees,
   findEmployeeById,
+  upsertManyEmployees,
 } from "./employee.repository";
 
 // ---------------------------------------------------------------------------
 
 const mockFindMany = vi.mocked(prisma.employee.findMany);
 const mockFindUnique = vi.mocked(prisma.employee.findUnique);
+const mockUpsert = vi.mocked(prisma.employee.upsert);
+const mockTransaction = vi.mocked(prisma.$transaction);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -152,5 +157,49 @@ describe("findEmployeeById", () => {
     const result = await findEmployeeById("unknown_id");
 
     expect(result).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// upsertManyEmployees
+// ---------------------------------------------------------------------------
+
+describe("upsertManyEmployees", () => {
+  beforeEach(() => {
+    mockUpsert.mockResolvedValue(buildEmployee());
+    mockTransaction.mockResolvedValue([]);
+  });
+
+  it("returns the number of rows upserted", async () => {
+    const rows = [
+      buildCsvRow(),
+      buildCsvRow({ employeeId: "emp_2", email: "bob@acme.com" }),
+    ];
+    const result = await upsertManyEmployees(rows);
+    expect(result).toBe(2);
+  });
+
+  it("returns 0 for an empty array without calling upsert", async () => {
+    const result = await upsertManyEmployees([]);
+    expect(result).toBe(0);
+    expect(mockUpsert).not.toHaveBeenCalled();
+  });
+
+  it("wraps all upserts in a single transaction", async () => {
+    await upsertManyEmployees([buildCsvRow(), buildCsvRow({ employeeId: "emp_2", email: "b@acme.com" })]);
+    expect(mockTransaction).toHaveBeenCalledOnce();
+  });
+
+  it("upserts by employeeId and combines firstName + lastName into name", async () => {
+    const row = buildCsvRow({ employeeId: "emp_42", firstName: "Alice", lastName: "Wonder" });
+    await upsertManyEmployees([row]);
+
+    expect(mockUpsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "emp_42" },
+        create: expect.objectContaining({ id: "emp_42", name: "Alice Wonder" }),
+        update: expect.objectContaining({ name: "Alice Wonder" }),
+      })
+    );
   });
 });
