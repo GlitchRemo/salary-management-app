@@ -145,16 +145,15 @@ Features
 
 * ✅ Application layout — DashboardLayout with petrol/off-white MUI theme, AppBar, NavigationSidebar
 * ✅ Navigation sidebar
-* Empty dashboard page
-* Employee table
+* ✅ Empty dashboard page
+* ✅ Employee table
 
 Commits
 
 1. ✅ feat: add application layout
 2. ✅ feat: add navigation sidebar
 3. ✅ feat: add dashboard placeholder page
-4. feat: build employee listing page
-5. feat: display employees in table
+4. ✅ feat: build employee listing page
 
 Definition of Done
 
@@ -174,7 +173,6 @@ Pages
 
 Features
 
-* Employee details page
 * Salary update modal
 * Edit base salary
 * Edit bonus
@@ -189,14 +187,11 @@ Read-only
 
 Commits
 
-1. feat: add employee details page
-2. test: add salary update service tests
-3. test: add salary audit tests
-4. feat: implement salary update service
-5. feat: persist salary audit records
-6. feat: expose update salary endpoint
-7. feat: add salary update modal
-8. feat: refresh employee table after updates
+1. feat: implement salary update service
+2. feat: persist salary audit records
+3. feat: expose update salary endpoint
+4. feat: add salary update modal
+5. feat: refresh employee table after updates
 
 Definition of Done
 
@@ -254,13 +249,11 @@ No partial imports are supported.
 
 Commits
 
-* test: add filtering tests
 * feat: implement filtering endpoint
 * feat: add search bar
 * feat: add country filter
 * feat: add department filter
 * feat: add pagination
-* test: add csv import validation tests
 * feat: implement csv parser service
 * feat: implement employee bulk import endpoint
 * feat: add csv upload component
@@ -291,10 +284,9 @@ Summary cards:
 
 Commits
 
-1. test: add dashboard metrics tests
-2. feat: implement dashboard queries
-3. feat: expose dashboard endpoint
-4. feat: build dashboard cards
+1. feat: implement dashboard queries
+2. feat: expose dashboard endpoint
+3. feat: build dashboard cards
 
 Definition of Done
 
@@ -317,13 +309,12 @@ Features
 
 Commits
 
-1. test: add analytics service tests
-2. feat: implement analytics queries
-3. feat: expose analytics endpoints
-4. feat: add payroll by country chart
-5. feat: add payroll by department chart
-6. feat: add average salary by country chart
-7. feat: add top earners table
+1. feat: implement analytics queries
+2. feat: expose analytics endpoints
+3. feat: add payroll by country chart
+4. feat: add payroll by department chart
+5. feat: add average salary by country chart
+6. feat: add top earners table
 
 Definition of Done
 
@@ -350,11 +341,10 @@ Seed Data
 
 Commits
 
-1. test: add authentication tests
-2. feat: implement login endpoint
-3. feat: add login page
-4. feat: protect routes
-5. feat: add logout functionality
+1. feat: implement login endpoint
+2. feat: add login page
+3. feat: protect routes
+4. feat: add logout functionality
 
 Definition of Done
 

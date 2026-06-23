@@ -225,6 +225,23 @@ Never skip specification updates.
 
 ---
 
+# Roadmap Updates After Implementation
+
+After completing any feature, commit, or task:
+
+Mark the corresponding item in `specs/roadmap.md` as done using ✅.
+
+This applies to:
+
+* Features listed under a phase
+* Individual commits listed under a phase
+
+Keep the roadmap an accurate reflection of what has been built.
+
+Never leave a completed item unmarked.
+
+---
+
 # Testing First
 
 Whenever possible:
