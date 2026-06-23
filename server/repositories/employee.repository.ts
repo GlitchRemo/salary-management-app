@@ -1,8 +1,8 @@
 import { prisma } from "@/server/db/client";
 import type { Employee } from "@/app/generated/prisma/client";
-import type { EmployeeRow } from "@/server/db/repositories/employee.types";
+import type { EmployeeRow } from "@/server/repositories/employee.types";
 
-export type { EmployeeRow } from "@/server/db/repositories/employee.types";
+export type { EmployeeRow } from "@/server/repositories/employee.types";
 
 export async function findAllEmployees(): Promise<EmployeeRow[]> {
   return prisma.employee.findMany({

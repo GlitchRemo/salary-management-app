@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { EmployeeRow } from "@/server/db/repositories/employee.types";
+import type { EmployeeRow } from "@/server/repositories/employee.types";
 
 // --- mock the repository before importing the service ---
-vi.mock("@/server/db/repositories/employee.repository", () => ({
+vi.mock("@/server/repositories/employee.repository", () => ({
   findAllEmployees: vi.fn(),
 }));
 
-import { findAllEmployees } from "@/server/db/repositories/employee.repository";
-import { listEmployees } from "@/server/db/services/employee.service";
+import { findAllEmployees } from "@/server/repositories/employee.repository";
+import { listEmployees } from "@/server/services/employee.service";
 
 // ---------------------------------------------------------------------------
 // Test factory

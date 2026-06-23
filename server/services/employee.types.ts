@@ -1,4 +1,4 @@
-import type { EmployeeRow } from "@/server/db/repositories/employee.types";
+import type { EmployeeRow } from "@/server/repositories/employee.types";
 
 export type EmployeeListItem = EmployeeRow & {
   totalCompensation: number;

@@ -187,7 +187,7 @@ Read-only
 
 Commits
 
-1. feat: implement salary update service
+1. ✅ feat: implement salary update service
 2. feat: persist salary audit records
 3. feat: expose update salary endpoint
 4. feat: add salary update modal

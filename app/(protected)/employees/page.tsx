@@ -1,4 +1,4 @@
-import { listEmployees } from "@/server/db/services/employee.service";
+import { listEmployees } from "@/server/services/employee.service";
 import Typography from "@mui/material/Typography";
 import Table from "@mui/material/Table";
 import TableHead from "@mui/material/TableHead";
