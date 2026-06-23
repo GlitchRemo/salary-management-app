@@ -1,4 +1,4 @@
-import type { FilterOption } from "@/components/atoms/EnumFilterSelect";
+import type { FilterOption } from "@/components/atoms/EnumFilterSelect.interface";
 
 export const COUNTRY_OPTIONS: FilterOption[] = [
   { value: "US", label: "United States" },

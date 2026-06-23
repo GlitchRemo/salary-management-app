@@ -5,19 +5,8 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
+import type { EnumFilterSelectProps } from "./EnumFilterSelect.interface";
 
-export interface FilterOption {
-  value: string;
-  label: string;
-}
-
-interface EnumFilterSelectProps {
-  param: string;
-  label: string;
-  allLabel: string;
-  options: FilterOption[];
-  ariaLabel: string;
-}
 
 export function EnumFilterSelect({
   param,

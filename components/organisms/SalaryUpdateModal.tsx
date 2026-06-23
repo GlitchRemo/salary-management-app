@@ -13,14 +13,8 @@ import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
-import type { EmployeeDto } from "@/server/modules/employee/employee.service";
-
-type SalaryEmployee = Pick<EmployeeDto, "id" | "currency" | "baseSalary" | "bonus" | "name">;
-
-interface Props {
-  employee: SalaryEmployee;
-  onUpdate: (baseSalary: number, bonus: number) => Promise<void>;
-}
+import type { SalaryUpdateModalProps } from "./SalaryUpdateModal.interface";
+import type { EditField } from "./SalaryUpdateModal.types";
 
 const CAPTION_SX = {
   textTransform: "uppercase" as const,
@@ -28,9 +22,7 @@ const CAPTION_SX = {
   letterSpacing: 0.5,
 };
 
-type EditField = "baseSalary" | "bonus";
-
-export function SalaryUpdateModal({ employee, onUpdate }: Props) {
+export function SalaryUpdateModal({ employee, onUpdate }: SalaryUpdateModalProps) {
   const router = useRouter();
   const [editField, setEditField] = useState<EditField | null>(null);
   const [value, setValue] = useState("");
