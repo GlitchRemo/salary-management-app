@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { listEmployees } from "@/server/modules/employee/employee.service";
+import { Country, Department } from "@/app/generated/prisma/enums";
+import type { EmployeeFilters } from "@/server/modules/employee/employee.types";
 import { SearchBar } from "@/components/molecules/SearchBar";
+import { EnumFilterSelect } from "@/components/atoms/EnumFilterSelect";
+import { COUNTRY_OPTIONS, DEPARTMENT_OPTIONS } from "@/app/constants";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Table from "@mui/material/Table";
 import TableHead from "@mui/material/TableHead";
@@ -14,17 +19,44 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 export default async function EmployeesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string }>;
+  searchParams: Promise<{ search?: string; country?: string; department?: string }>;
 }) {
-  const { search } = await searchParams;
-  const employees = await listEmployees(search ? { search } : {});
+  const { search, country: countryParam, department: departmentParam } = await searchParams;
+  const country = countryParam && (Object.values(Country) as string[]).includes(countryParam)
+    ? (countryParam as Country)
+    : undefined;
+  const department = departmentParam && (Object.values(Department) as string[]).includes(departmentParam)
+    ? (departmentParam as Department)
+    : undefined;
+  const filters: EmployeeFilters = {
+    ...(search && { search }),
+    ...(country && { country }),
+    ...(department && { department }),
+  };
+  const employees = await listEmployees(filters);
 
   return (
     <>
       <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
         Employees
       </Typography>
-      <SearchBar />
+      <Box sx={{ display: "flex", gap: 2, mb: 2, alignItems: "center", flexWrap: "wrap" }}>
+        <SearchBar />
+        <EnumFilterSelect
+          param="country"
+          label="Country"
+          allLabel="All countries"
+          options={COUNTRY_OPTIONS}
+          ariaLabel="Filter by country"
+        />
+        <EnumFilterSelect
+          param="department"
+          label="Department"
+          allLabel="All departments"
+          options={DEPARTMENT_OPTIONS}
+          ariaLabel="Filter by department"
+        />
+      </Box>
       <Paper elevation={0} variant="outlined" sx={{ borderRadius: 2, overflow: "hidden" }}>
         <TableContainer>
           <Table size="small">

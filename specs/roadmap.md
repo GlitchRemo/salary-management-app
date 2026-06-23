@@ -241,8 +241,8 @@ Commits
 
 * ✅ feat: implement filtering endpoint
 * ✅ feat: add search bar
-* feat: add country filter
-* feat: add department filter
+* ✅ feat: add country filter
+* ✅ feat: add department filter
 * feat: add pagination
 * feat: implement csv parser service
 * feat: implement employee bulk import endpoint

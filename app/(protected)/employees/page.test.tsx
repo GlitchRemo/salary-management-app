@@ -10,10 +10,16 @@ vi.mock("@/components/molecules/SearchBar", () => ({
   SearchBar: () => null,
 }));
 
+vi.mock("@/components/atoms/EnumFilterSelect", () => ({
+  EnumFilterSelect: () => null,
+}));
+
 import { listEmployees } from "@/server/modules/employee/employee.service";
 import EmployeesPage from "@/app/(protected)/employees/page";
 
-function makeSearchParams(params: { search?: string } = {}): Promise<{ search?: string }> {
+function makeSearchParams(
+  params: { search?: string; country?: string; department?: string } = {},
+): Promise<{ search?: string; country?: string; department?: string }> {
   return Promise.resolve(params);
 }
 
@@ -77,6 +83,24 @@ describe("EmployeesPage", () => {
     vi.mocked(listEmployees).mockResolvedValue([]);
     await EmployeesPage({ searchParams: makeSearchParams({ search: "Alice" }) });
     expect(listEmployees).toHaveBeenCalledWith({ search: "Alice" });
+  });
+
+  it("passes the country param to listEmployees", async () => {
+    vi.mocked(listEmployees).mockResolvedValue([]);
+    await EmployeesPage({ searchParams: makeSearchParams({ country: "DE" }) });
+    expect(listEmployees).toHaveBeenCalledWith({ country: "DE" });
+  });
+
+  it("passes the department param to listEmployees", async () => {
+    vi.mocked(listEmployees).mockResolvedValue([]);
+    await EmployeesPage({ searchParams: makeSearchParams({ department: "Engineering" }) });
+    expect(listEmployees).toHaveBeenCalledWith({ department: "Engineering" });
+  });
+
+  it("ignores invalid country values", async () => {
+    vi.mocked(listEmployees).mockResolvedValue([]);
+    await EmployeesPage({ searchParams: makeSearchParams({ country: "INVALID" }) });
+    expect(listEmployees).toHaveBeenCalledWith({});
   });
 
   it("calls listEmployees with empty filters when no search param is present", async () => {

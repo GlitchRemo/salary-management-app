@@ -37,7 +37,7 @@ export function SearchBar() {
   }
 
   return (
-    <Box component="form" onSubmit={handleSubmit} aria-label="Search employees" sx={{ mb: 2 }}>
+    <Box component="form" onSubmit={handleSubmit} aria-label="Search employees">
       <TextField
         placeholder="Search by name…"
         value={value}
