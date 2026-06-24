@@ -199,9 +199,9 @@ describe("upsertManyEmployees", () => {
     expect(mockUpsert).not.toHaveBeenCalled();
   });
 
-  it("wraps all upserts in a single transaction", async () => {
+  it("wraps each row in its own independent transaction", async () => {
     await upsertManyEmployees([buildCsvRow(), buildCsvRow({ employeeId: "emp_2", email: "b@acme.com" })], CHANGER_ID);
-    expect(mockTransaction).toHaveBeenCalledOnce();
+    expect(mockTransaction).toHaveBeenCalledTimes(2);
   });
 
   it("upserts by employeeId and combines firstName + lastName into name", async () => {
@@ -217,15 +217,35 @@ describe("upsertManyEmployees", () => {
     );
   });
 
-  it("does not create a salary audit record for new employees", async () => {
+  it("creates a salary audit record for new employees with previous values of 0", async () => {
     mockFindUnique.mockResolvedValue(null);
-    const row = buildCsvRow({ employeeId: "emp_new" });
+    const row = buildCsvRow({ employeeId: "emp_new", baseSalary: 80000, bonus: 5000 });
+    await upsertManyEmployees([row], CHANGER_ID);
+
+    expect(mockSalaryAuditCreate).toHaveBeenCalledOnce();
+    expect(mockSalaryAuditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          employeeId: "emp_new",
+          previousBaseSalary: 0,
+          previousBonus: 0,
+          newBaseSalary: 80000,
+          newBonus: 5000,
+        }),
+      })
+    );
+  });
+
+  it("does not create a salary audit record when salary and bonus are unchanged", async () => {
+    const existing = buildEmployee({ id: "emp_same", baseSalary: 80000, bonus: 5000 });
+    mockFindUnique.mockResolvedValue(existing);
+    const row = buildCsvRow({ employeeId: "emp_same", baseSalary: 80000, bonus: 5000 });
     await upsertManyEmployees([row], CHANGER_ID);
 
     expect(mockSalaryAuditCreate).not.toHaveBeenCalled();
   });
 
-  it("creates a salary audit record only for existing employees", async () => {
+  it("creates a salary audit record when salary changes for existing employees", async () => {
     const existing = buildEmployee({ id: "emp_1" });
     mockFindUnique.mockResolvedValue(existing);
     const row = buildCsvRow({ employeeId: "emp_1", baseSalary: 90000, bonus: 5000 });
@@ -242,6 +262,22 @@ describe("upsertManyEmployees", () => {
         }),
       })
     );
+  });
+
+  it("skips failed rows and continues processing the rest", async () => {
+    mockTransaction
+      .mockRejectedValueOnce(new Error("DB error"))
+      .mockImplementation(async (fn: unknown) => {
+        if (typeof fn === "function") return fn(prisma);
+      });
+
+    const rows = [
+      buildCsvRow({ employeeId: "emp_fail" }),
+      buildCsvRow({ employeeId: "emp_ok", email: "ok@acme.com" }),
+    ];
+    const result = await upsertManyEmployees(rows, CHANGER_ID);
+
+    expect(result).toBe(1);
   });
 
   it("captures previous salary values for existing employees", async () => {

@@ -25,6 +25,11 @@ export async function updateSalary(params: SalaryUpdateParams): Promise<Employee
     throw new NotFoundError(ERROR_MESSAGES.EMPLOYEE_NOT_FOUND);
   }
 
+  const salaryUnchanged = employee.baseSalary === baseSalary && employee.bonus === bonus;
+  if (salaryUnchanged) {
+    return employee;
+  }
+
   const updated = await updateEmployeeSalary(employeeId, { baseSalary, bonus });
 
   await createSalaryAudit({

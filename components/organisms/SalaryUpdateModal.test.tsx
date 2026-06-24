@@ -113,6 +113,7 @@ describe("SalaryUpdateModal", () => {
     renderModal();
     openModal();
     await act(async () => {
+      fireEvent.change(screen.getByDisplayValue("80000"), { target: { value: "90000" } });
       fireEvent.click(screen.getByRole("button", { name: /save/i }));
     });
     expect(mockRefresh).toHaveBeenCalled();
@@ -154,9 +155,18 @@ describe("SalaryUpdateModal", () => {
     const mockOnUpdate = vi.fn().mockRejectedValue(new Error("server error"));
     renderModal({ onUpdate: mockOnUpdate });
     openModal();
+    fireEvent.change(screen.getByDisplayValue("80000"), { target: { value: "90000" } });
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
     expect(
       await screen.findByText(/failed to update salary/i),
     ).toBeInTheDocument();
+  });
+
+  it("does not call onUpdate when the value is unchanged", async () => {
+    const { mockOnUpdate } = renderModal();
+    openModal();
+    // value is pre-filled with current salary — do not change it
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+    expect(mockOnUpdate).not.toHaveBeenCalled();
   });
 });

@@ -72,6 +72,22 @@ describe("updateSalary", () => {
     ).rejects.toThrow(ValidationError);
   });
 
+  it("returns the existing employee without updating or auditing when salary is unchanged", async () => {
+    const employee = buildEmployee({ baseSalary: 80000, bonus: 5000 });
+    vi.mocked(findEmployeeById).mockResolvedValue(employee);
+
+    const result = await updateSalary({
+      employeeId: employee.id,
+      baseSalary: 80000,
+      bonus: 5000,
+      changedById: "hr_1",
+    });
+
+    expect(result).toEqual(employee);
+    expect(vi.mocked(updateEmployeeSalary)).not.toHaveBeenCalled();
+    expect(vi.mocked(createSalaryAudit)).not.toHaveBeenCalled();
+  });
+
   it("throws NotFoundError when employee does not exist", async () => {
     vi.mocked(findEmployeeById).mockResolvedValue(null);
 

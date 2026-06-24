@@ -31,44 +31,59 @@ export async function findEmployeeById(id: string): Promise<Employee | null> {
 }
 
 export async function upsertManyEmployees(rows: CsvRow[], changedById: string): Promise<number> {
-  await prisma.$transaction(async (tx) => {
-    for (const row of rows) {
-      const existing = await tx.employee.findUnique({ where: { id: row.employeeId } });
-      await tx.employee.upsert({
-        where: { id: row.employeeId },
-        update: {
-          name: `${row.firstName} ${row.lastName}`,
-          email: row.email,
-          department: row.department,
-          country: row.country,
-          currency: row.currency,
-          baseSalary: row.baseSalary,
-          bonus: row.bonus,
-        },
-        create: {
-          id: row.employeeId,
-          name: `${row.firstName} ${row.lastName}`,
-          email: row.email,
-          department: row.department,
-          country: row.country,
-          currency: row.currency,
-          baseSalary: row.baseSalary,
-          bonus: row.bonus,
-        },
-      });
-      if (existing !== null) {
-        await tx.salaryAudit.create({
-          data: {
-            employeeId: row.employeeId,
-            changedById,
-            previousBaseSalary: existing.baseSalary,
-            newBaseSalary: row.baseSalary,
-            previousBonus: existing.bonus,
-            newBonus: row.bonus,
+  let successCount = 0;
+
+  for (const row of rows) {
+    try {
+      await prisma.$transaction(async (tx) => {
+        const existing = await tx.employee.findUnique({ where: { id: row.employeeId } });
+
+        await tx.employee.upsert({
+          where: { id: row.employeeId },
+          update: {
+            name: `${row.firstName} ${row.lastName}`,
+            email: row.email,
+            department: row.department,
+            country: row.country,
+            currency: row.currency,
+            baseSalary: row.baseSalary,
+            bonus: row.bonus,
+          },
+          create: {
+            id: row.employeeId,
+            name: `${row.firstName} ${row.lastName}`,
+            email: row.email,
+            department: row.department,
+            country: row.country,
+            currency: row.currency,
+            baseSalary: row.baseSalary,
+            bonus: row.bonus,
           },
         });
-      }
+
+        const previousBaseSalary = existing?.baseSalary ?? 0;
+        const previousBonus = existing?.bonus ?? 0;
+        const salaryUnchanged = previousBaseSalary === row.baseSalary && previousBonus === row.bonus;
+
+        if (!salaryUnchanged) {
+          await tx.salaryAudit.create({
+            data: {
+              employeeId: row.employeeId,
+              changedById,
+              previousBaseSalary,
+              newBaseSalary: row.baseSalary,
+              previousBonus,
+              newBonus: row.bonus,
+            },
+          });
+        }
+      });
+
+      successCount++;
+    } catch {
+      // Individual row failure does not abort remaining rows
     }
-  });
-  return rows.length;
+  }
+
+  return successCount;
 }

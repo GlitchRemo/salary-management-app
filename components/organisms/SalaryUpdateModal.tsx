@@ -54,10 +54,15 @@ export function SalaryUpdateModal({ employee, onUpdate }: SalaryUpdateModalProps
       setError(err);
       return;
     }
+    const num = Number(value);
+    const currentValue = editField === "baseSalary" ? employee.baseSalary : employee.bonus;
+    if (num === currentValue) {
+      setEditField(null);
+      return;
+    }
     setLoading(true);
     setServerError(null);
     try {
-      const num = Number(value);
       const baseSalary = editField === "baseSalary" ? num : employee.baseSalary;
       const bonus = editField === "bonus" ? num : employee.bonus;
       await onUpdate(baseSalary, bonus);

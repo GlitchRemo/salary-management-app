@@ -56,3 +56,12 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Test Credentials
+
+The seed inserts one HR user. Use these credentials to log in:
+
+| Field    | Value          |
+|----------|----------------|
+| Email    | hr@acme.com    |
+| Password | password       |
+
