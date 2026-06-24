@@ -13,22 +13,28 @@ Single HR user. No self-registration. No password reset.
 **Flow:**
 
 1. User enters email and password.
-2. Client sends `POST /auth/login` with credentials.
-3. Server looks up HRUser by email.
-4. Server verifies password against stored hash.
-5. On success: server creates a session and returns session token.
-6. Client stores session token.
-7. Client redirects to `/dashboard`.
+2. Login form submits to a Server Action.
+3. Server Action validates input with Zod.
+4. Server looks up HRUser by email.
+5. Server verifies password against stored hash (SHA-256).
+6. On success: server signs a stateless session token (HMAC-SHA256, 7-day TTL) and writes it as an `HttpOnly` session cookie.
+7. Server Action redirects to `/dashboard`.
+
+**Session token**
+
+Stateless HMAC-SHA256 signed token. Format: `<base64url(payload)>.<signature>`
+
+Payload contains `userId` and `expiresAt` (Unix timestamp ms). Verified on every protected request by Next.js middleware.
 
 **Failure cases:**
 
-| Condition | Response |
+| Condition | Shown to user |
 |---|---|
-| Email not found | 401 Invalid credentials |
-| Password incorrect | 401 Invalid credentials |
-| Missing fields | 400 Validation error |
+| Email not found | "Invalid credentials" |
+| Password incorrect | "Invalid credentials" |
+| Missing or invalid fields | Zod validation error |
 
-Note: Do not distinguish between "email not found" and "wrong password" in the error message. Return a generic invalid credentials message to avoid user enumeration.
+Note: Do not distinguish between "email not found" and "wrong password" to avoid user enumeration.
 
 ---
 
@@ -38,10 +44,9 @@ Note: Do not distinguish between "email not found" and "wrong password" in the e
 
 **Flow:**
 
-1. Client sends `POST /auth/logout`.
-2. Server invalidates the session.
-3. Client clears session token.
-4. Client redirects to `/login`.
+1. Logout button submits to a Server Action.
+2. Server Action clears the `session` cookie.
+3. Server Action redirects to `/login`.
 
 ---
 
@@ -52,7 +57,7 @@ All routes except `/login` are protected.
 **Flow:**
 
 1. Request arrives at a protected route.
-2. Middleware checks for a valid session token.
+2. Next.js middleware checks the `session` cookie for a valid, unexpired token.
 3. If valid: request proceeds.
 4. If missing or expired: redirect to `/login`.
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { listEmployees, importEmployees } from "@/server/modules/employee/employee.service";
+import { getSessionUserId } from "@/server/modules/auth/session";
 import { findFirstHrUserId } from "@/server/modules/hr-user/hr-user.repository";
 import { Country, Department } from "@/app/generated/prisma/enums";
 import type { EmployeeFilters, ImportResult } from "@/server/modules/employee/employee.types";
@@ -48,7 +49,7 @@ export default async function EmployeesPage({
       return { success: false, errors: ["Please select a CSV file"] };
     }
     const csvContent = await file.text();
-    const changedById = (await findFirstHrUserId()) ?? "system";
+    const changedById = (await getSessionUserId()) ?? (await findFirstHrUserId()) ?? "system";
     const result = await importEmployees(csvContent, changedById);
     if (result.success) {
       revalidatePath("/employees");

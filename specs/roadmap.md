@@ -257,7 +257,37 @@ HR users can import employee data using a CSV file that conforms to the Employee
 
 ---
 
-# Phase 6 — Dashboard
+# Phase 6 — Authentication
+
+Goal
+
+Restrict access to HR users.
+
+Features
+
+* Login page
+* Logout
+* Session management
+* Protected routes
+
+Seed Data
+
+* One HR user
+
+Commits
+
+1. ✅ feat: implement login endpoint
+2. feat: add login page
+3. feat: protect routes
+4. feat: add logout functionality
+
+Definition of Done
+
+Only HR users can access the application.
+
+---
+
+# Phase 7 — Dashboard
 
 Goal
 
@@ -284,7 +314,7 @@ The dashboard provides organization-wide metrics.
 
 ---
 
-# Phase 7 — Analytics
+# Phase 8 — Analytics
 
 Goal
 
@@ -309,36 +339,6 @@ Commits
 Definition of Done
 
 HR managers can answer compensation questions.
-
----
-
-# Phase 8 — Authentication
-
-Goal
-
-Restrict access to HR users.
-
-Features
-
-* Login page
-* Logout
-* Session management
-* Protected routes
-
-Seed Data
-
-* One HR user
-
-Commits
-
-1. feat: implement login endpoint
-2. feat: add login page
-3. feat: protect routes
-4. feat: add logout functionality
-
-Definition of Done
-
-Only HR users can access the application.
 
 ---
 

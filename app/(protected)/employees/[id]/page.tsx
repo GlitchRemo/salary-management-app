@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getEmployee } from "@/server/modules/employee/employee.service";
 import { updateSalary } from "@/server/modules/salary/salary.service";
+import { getSessionUserId } from "@/server/modules/auth/session";
 import { findFirstHrUserId } from "@/server/modules/hr-user/hr-user.repository";
 import { SalaryUpdateModal } from "@/components/organisms/SalaryUpdateModal";
 import Typography from "@mui/material/Typography";
@@ -24,7 +25,7 @@ export default async function EmployeeDetailsPage({ params }: Props) {
 
   async function handleSalaryUpdate(baseSalary: number, bonus: number) {
     "use server";
-    const changedById = (await findFirstHrUserId()) ?? "system";
+    const changedById = (await getSessionUserId()) ?? (await findFirstHrUserId()) ?? "system";
     await updateSalary({ employeeId: id, baseSalary, bonus, changedById });
     revalidatePath(`/employees/${id}`);
   }

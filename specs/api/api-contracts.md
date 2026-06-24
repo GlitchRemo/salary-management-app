@@ -1,7 +1,7 @@
 # Data Contracts
 
-> **Note (2026-06-23):** This project has no REST API or Server Actions.
-> Pages and components call service and repository functions directly.
+> **Note (2026-06-23):** This project has no REST API.
+> Pages and Server Actions call service functions directly.
 > This document defines the shared data shapes (DTOs) and the input/output
 > contracts for each service operation that crosses a layer boundary.
 
@@ -88,264 +88,28 @@ All columns required. No extra columns permitted. No partial imports.
 
 **Errors:** `ValidationError` for malformed rows.
 
-
-**Request**
-
-```json
-{
-  "email": "hr@acme.com",
-  "password": "secret"
-}
-```
-
-**Response 200**
-
-```json
-{
-  "token": "session-token"
-}
-```
-
-**Errors:** 400, 401
-
 ---
 
-### POST /api/auth/logout
+### login
 
-**Request:** No body. Requires valid session token in header.
+**File:** `server/modules/auth/auth.service.ts`
 
-**Response 200**
+**Purpose:** Verify HR user credentials and return a signed session token. Called from the login Server Action, which writes the token as an `HttpOnly` session cookie.
 
-```json
+**Input**
+
+```ts
 {
-  "message": "Logged out successfully"
+  email: string;
+  password: string;
 }
 ```
 
-**Errors:** 401
+Validated with Zod before calling the service.
 
----
+**Output:** `string` — signed session token.
 
-## Employees
-
-### GET /api/employees
-
-Returns a paginated list of employees.
-
-**Query Parameters**
-
-| Parameter | Type | Required | Default | Description |
-|---|---|---|---|---|
-| page | number | No | 1 | Page number |
-| pageSize | number | No | 25 | Results per page |
-| search | string | No | — | Partial name match (case-insensitive) |
-| country | string | No | — | Filter by country |
-| department | string | No | — | Filter by department |
-
-**Response 200**
-
-```json
-{
-  "data": [
-    {
-      "id": "emp_123",
-      "name": "Jane Smith",
-      "email": "jane.smith@acme.com",
-      "department": "Engineering",
-      "country": "United Kingdom",
-      "currency": "GBP",
-      "baseSalary": 75000,
-      "bonus": 5000,
-      "updatedAt": "2026-01-15T10:30:00Z"
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "pageSize": 25,
-    "total": 10000,
-    "totalPages": 400
-  }
-}
-```
-
-**Errors:** 401
-
----
-
-### GET /api/employees/:id
-
-Returns full details of a single employee.
-
-**Response 200**
-
-```json
-{
-  "id": "emp_123",
-  "name": "Jane Smith",
-  "email": "jane.smith@acme.com",
-  "department": "Engineering",
-  "country": "United Kingdom",
-  "currency": "GBP",
-  "baseSalary": 75000,
-  "bonus": 5000,
-  "updatedAt": "2026-01-15T10:30:00Z",
-  "createdAt": "2024-03-01T09:00:00Z"
-}
-```
-
-**Errors:** 401, 404
-
----
-
-### PATCH /api/employees/:id/salary
-
-Updates an employee's salary fields.
-
-**Request**
-
-```json
-{
-  "baseSalary": 80000,
-  "bonus": 6000
-}
-```
-
-**Response 200**
-
-```json
-{
-  "id": "emp_123",
-  "name": "Jane Smith",
-  "email": "jane.smith@acme.com",
-  "department": "Engineering",
-  "country": "United Kingdom",
-  "currency": "GBP",
-  "baseSalary": 80000,
-  "bonus": 6000,
-  "updatedAt": "2026-06-23T14:00:00Z",
-  "createdAt": "2024-03-01T09:00:00Z"
-}
-```
-
-**Errors:** 400, 401, 404
-
----
-
-### POST /api/employees/import
-
-Upserts employee records from the uploaded CSV file. New employees are inserted; existing employees matched by `employeeId` are updated. Employees not present in the CSV are left untouched.
-
-**Request**
-
-Content-Type: `multipart/form-data`
-
-| Field | Type | Description |
-|---|---|---|
-| file | File | CSV file conforming to the import schema |
-
-**CSV column contract:** `employeeId`, `firstName`, `lastName`, `email`, `department`, `country`, `currency`, `baseSalary`, `bonus`
-
-All columns are required. No extra columns permitted. No partial imports.
-
-**Response 200**
-
-```json
-{
-  "created": 350,
-  "updated": 9650
-}
-```
-
-**Response 400 — validation failure (no data written)**
-
-```json
-{
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "CSV validation failed",
-    "details": [
-      { "row": 3, "field": "baseSalary", "message": "Must be greater than 0" },
-      { "row": 7, "field": "email", "message": "Duplicate email within file" }
-    ]
-  }
-}
-```
-
-**Errors:** 400, 401
-
----
-
-## Dashboard
-
-### GET /api/dashboard
-
-Returns organisation-wide summary metrics.
-
-**Response 200**
-
-```json
-{
-  "employeeCount": 10000,
-  "totalPayroll": 850000000,
-  "averageSalary": 72000,
-  "countriesRepresented": 15
-}
-```
-
-**Errors:** 401
-
----
-
-## Analytics
-
-### GET /api/analytics/payroll-by-country
-
-**Response 200**
-
-```json
-{
-  "data": [
-    { "country": "United Kingdom", "totalPayroll": 120000000 },
-    { "country": "United States", "totalPayroll": 340000000 }
-  ]
-}
-```
-
-**Errors:** 401
-
----
-
-### GET /api/analytics/payroll-by-department
-
-**Response 200**
-
-```json
-{
-  "data": [
-    { "department": "Engineering", "totalPayroll": 250000000 },
-    { "department": "Sales", "totalPayroll": 180000000 }
-  ]
-}
-```
-
-**Errors:** 401
-
----
-
-### GET /api/analytics/average-salary-by-country
-
-**Response 200**
-
-```json
-{
-  "data": [
-    { "country": "United Kingdom", "averageSalary": 68000 },
-    { "country": "United States", "averageSalary": 92000 }
-  ]
-}
-```
-
-**Errors:** 401
+**Errors:** `UnauthorizedError` if credentials are invalid (email not found or password mismatch). Error message is always "Invalid credentials" to avoid user enumeration.
 
 ---
 
