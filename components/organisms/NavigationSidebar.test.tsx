@@ -1,6 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { NavigationSidebar } from "@/components/organisms/NavigationSidebar";
+
+vi.mock("@/app/(protected)/actions", () => ({
+  logoutAction: vi.fn(),
+}));
 
 describe("NavigationSidebar", () => {
   it("renders the Dashboard navigation link", () => {
@@ -22,5 +26,10 @@ describe("NavigationSidebar", () => {
     const link = screen.getByRole("link", { name: /analytics/i });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href", "/analytics");
+  });
+
+  it("renders a Logout button", () => {
+    render(<NavigationSidebar />);
+    expect(screen.getByRole("button", { name: /logout/i })).toBeInTheDocument();
   });
 });

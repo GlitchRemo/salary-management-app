@@ -279,7 +279,7 @@ Commits
 1. ✅ feat: implement login endpoint
 2. ✅ feat: add login page
 3. ✅ feat: protect routes
-4. feat: add logout functionality
+4. ✅ feat: add logout functionality
 
 Definition of Done
 

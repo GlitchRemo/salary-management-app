@@ -10,12 +10,32 @@ vi.mock("@/server/db/client", () => ({
 }));
 
 import { prisma } from "@/server/db/client";
-import { findHrUserByEmail } from "./hr-user.repository";
+import { findHrUserById, findHrUserByEmail } from "./hr-user.repository";
 
 const mockFindUnique = vi.mocked(prisma.hRUser.findUnique);
 
 beforeEach(() => {
   vi.clearAllMocks();
+});
+
+describe("findHrUserById", () => {
+  it("returns the HR user with the given id", async () => {
+    const user = buildHrUser({ id: "hr_1" });
+    mockFindUnique.mockResolvedValue(user);
+
+    const result = await findHrUserById("hr_1");
+
+    expect(result).toEqual(user);
+    expect(mockFindUnique).toHaveBeenCalledWith({ where: { id: "hr_1" } });
+  });
+
+  it("returns null when no HR user matches the id", async () => {
+    mockFindUnique.mockResolvedValue(null);
+
+    const result = await findHrUserById("unknown");
+
+    expect(result).toBeNull();
+  });
 });
 
 describe("findHrUserByEmail", () => {

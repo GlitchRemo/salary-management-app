@@ -19,4 +19,19 @@ describe("DashboardLayout", () => {
     expect(screen.getByRole("link", { name: /employees/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /analytics/i })).toBeInTheDocument();
   });
+
+  it("shows the user email in the AppBar when provided", () => {
+    render(<DashboardLayout userEmail="hr@acme.com">content</DashboardLayout>);
+    expect(screen.getByText("hr@acme.com")).toBeInTheDocument();
+  });
+
+  it("shows the avatar initial derived from the user email", () => {
+    render(<DashboardLayout userEmail="hr@acme.com">content</DashboardLayout>);
+    expect(screen.getByText("H")).toBeInTheDocument();
+  });
+
+  it("does not render user info when no email is provided", () => {
+    render(<DashboardLayout>content</DashboardLayout>);
+    expect(screen.queryByText(/@/)).not.toBeInTheDocument();
+  });
 });
