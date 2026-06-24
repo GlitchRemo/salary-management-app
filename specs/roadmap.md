@@ -287,11 +287,11 @@ Only HR users can access the application.
 
 ---
 
-# Phase 7 — Dashboard
+# Phase 7 — Dashboard & Analytics
 
 Goal
 
-Provide a high-level overview.
+Give HR a single view of organisation-wide metrics and compensation distribution.
 
 Features
 
@@ -302,43 +302,26 @@ Summary cards:
 * Average salary
 * Countries represented
 
-Commits
-
-1. feat: implement dashboard queries
-2. feat: expose dashboard endpoint
-3. feat: build dashboard cards
-
-Definition of Done
-
-The dashboard provides organization-wide metrics.
-
----
-
-# Phase 8 — Analytics
-
-Goal
-
-Help HR understand compensation distribution.
-
-Features
+Charts:
 
 * Payroll by country
 * Payroll by department
 * Average salary by country
-* Top earners
+* Budget allocation by department per country (pie chart with country selector)
+* Salary range by department per country (low / mid / high grouped bar chart with country selector)
+
+Table:
+
+* Top earners (top 10 by total compensation)
 
 Commits
 
-1. feat: implement analytics queries
-2. feat: expose analytics endpoints
-3. feat: add payroll by country chart
-4. feat: add payroll by department chart
-5. feat: add average salary by country chart
-6. feat: add top earners table
+1. feat: implement analytics service
+2. feat: build dashboard page
 
 Definition of Done
 
-HR managers can answer compensation questions.
+The dashboard provides organisation-wide metrics and can answer compensation questions.
 
 ---
 

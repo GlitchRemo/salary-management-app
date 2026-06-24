@@ -4,6 +4,24 @@ This file records significant specification or architectural decisions made with
 
 ---
 
+## 2026-06-24 — Merged Dashboard and Analytics into a single page
+
+**Cause**
+
+The roadmap had a separate Phase 7 (Dashboard — summary cards) and Phase 8 (Analytics — charts and top earners). On reflection, the dashboard summary cards (employee count, total payroll, average salary, countries represented) are a subset of analytics and do not justify a separate page. Maintaining two phases and two routes added unnecessary complexity.
+
+**Decision**
+
+* Merge Phase 7 and Phase 8 into a single Phase 7 — Dashboard & Analytics.
+* The `/dashboard` route displays all metrics: summary cards, payroll charts, average salary chart, and top earners table.
+* The `/analytics` route is eliminated. There is no separate analytics page.
+* The Analytics link is removed from the `NavigationSidebar`.
+* `specs/business/analytics.md` updated: removed the Dashboard/Analytics split; all metrics are now listed under one spec.
+* `specs/ui/pages.md` updated: Analytics page removed; Dashboard page now lists all components; Analytics removed from the nav table.
+* `specs/roadmap.md` updated: Phases 7 and 8 collapsed into a single phase with two commits.
+
+---
+
 ## 2026-06-24 — Country, Department, and Currency represented as Prisma enums
 
 **Cause**

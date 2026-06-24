@@ -21,13 +21,6 @@ describe("NavigationSidebar", () => {
     expect(link).toHaveAttribute("href", "/employees");
   });
 
-  it("renders the Analytics navigation link", () => {
-    render(<NavigationSidebar />);
-    const link = screen.getByRole("link", { name: /analytics/i });
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute("href", "/analytics");
-  });
-
   it("renders a Logout button", () => {
     render(<NavigationSidebar />);
     expect(screen.getByRole("button", { name: /logout/i })).toBeInTheDocument();

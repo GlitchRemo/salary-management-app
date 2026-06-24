@@ -8,7 +8,6 @@ The application uses a persistent sidebar for navigation.
 |---|---|---|
 | Dashboard | `/dashboard` | Authenticated |
 | Employees | `/employees` | Authenticated |
-| Analytics | `/analytics` | Authenticated |
 | Logout | — | Authenticated |
 
 Unauthenticated users are redirected to `/login`.
@@ -52,7 +51,7 @@ Contains:
 
 ### Dashboard Page — `/dashboard`
 
-**Purpose:** Provide a high-level overview of the organisation.
+**Purpose:** Provide organisation-wide metrics and compensation distribution in a single view.
 
 **Components:**
 
@@ -61,10 +60,16 @@ Contains:
   * Total Payroll
   * Average Salary
   * Countries Represented
+* Payroll by Country chart (bar chart).
+* Payroll by Department chart (bar chart).
+* Average Salary by Country chart (bar chart).
+* Budget Allocation by Department chart (pie chart with country selector).
+* Salary Range by Department chart (grouped bar chart per country: low / mid / high per department, with country selector).
+* `TopEarnersTable` organism — one table per currency showing top 10 earners within that currency.
 
-**Loading state:** Skeleton cards while data loads.
+**Loading state:** Skeleton cards and charts while data loads.
 
-**Error state:** Error message if the API fails.
+**Error state:** Error message per section if data fails.
 
 ---
 
@@ -124,23 +129,6 @@ Contains:
 
 ---
 
-### Analytics Page — `/analytics`
-
-**Purpose:** Help HR understand compensation distribution.
-
-**Components:**
-
-* Payroll by Country chart (bar chart).
-* Payroll by Department chart (bar chart).
-* Average Salary by Country chart (bar chart).
-* `TopEarnersTable` organism — table of top 10 earners.
-
-**Loading state:** Skeleton charts while data loads.
-
-**Error state:** Error message per chart section if data fails.
-
----
-
 ## Atomic Design Reference
 
 | Level | Components |
@@ -149,7 +137,7 @@ Contains:
 | Molecules | SearchBar, CountryFilter, DepartmentFilter, CsvImportButton |
 | Organisms | EmployeeTable, SalaryUpdateModal, SummaryCard, TopEarnersTable |
 | Templates | DashboardLayout |
-| Pages | LoginPage, DashboardPage, EmployeesPage, EmployeeDetailsPage, AnalyticsPage |
+| Pages | LoginPage, DashboardPage, EmployeesPage, EmployeeDetailsPage |
 
 ---
 

@@ -17,7 +17,6 @@ describe("DashboardLayout", () => {
     render(<DashboardLayout>content</DashboardLayout>);
     expect(screen.getByRole("link", { name: /dashboard/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /employees/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /analytics/i })).toBeInTheDocument();
   });
 
   it("shows the user email in the AppBar when provided", () => {
