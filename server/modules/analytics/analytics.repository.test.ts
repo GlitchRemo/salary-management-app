@@ -8,6 +8,7 @@ vi.mock("@/server/db/client", () => ({
       aggregate: vi.fn(),
       groupBy: vi.fn(),
       findMany: vi.fn(),
+      findFirst: vi.fn(),
     },
   },
 }));
@@ -21,12 +22,16 @@ import {
   getDepartmentPayrollForCountry,
   getSalaryRangeByDepartmentForCountry,
   getAllEmployeesForTopEarners,
+  getSummaryStatsForCountry,
+  getAverageSalaryByDepartmentForCountry,
+  getAllEmployeesForTopEarnersInCountry,
 } from "./analytics.repository";
 
 const mockCount = vi.mocked(prisma.employee.count);
 const mockAggregate = vi.mocked(prisma.employee.aggregate);
 const mockGroupBy = vi.mocked(prisma.employee.groupBy);
 const mockFindMany = vi.mocked(prisma.employee.findMany);
+const mockFindFirst = vi.mocked(prisma.employee.findFirst);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -149,5 +154,66 @@ describe("getAllEmployeesForTopEarners", () => {
     expect(mockFindMany).toHaveBeenCalledWith({
       select: { name: true, department: true, country: true, currency: true, baseSalary: true, bonus: true },
     });
+  });
+});
+
+describe("getSummaryStatsForCountry", () => {
+  it("returns summary stats scoped to a country", async () => {
+    mockCount.mockResolvedValue(4);
+    mockAggregate.mockResolvedValue({
+      _sum: { baseSalary: 400000, bonus: 40000 },
+      _avg: { baseSalary: 100000 },
+    } as never);
+    mockFindFirst.mockResolvedValue({ currency: Currency.USD } as never);
+
+    const result = await getSummaryStatsForCountry(Country.US);
+
+    expect(result).toEqual({
+      employeeCount: 4,
+      totalPayroll: 440000,
+      averageSalary: 100000,
+      currency: Currency.USD,
+    });
+    expect(mockCount).toHaveBeenCalledWith({ where: { country: Country.US } });
+  });
+
+  it("falls back to empty string currency when no employees exist", async () => {
+    mockCount.mockResolvedValue(0);
+    mockAggregate.mockResolvedValue({
+      _sum: { baseSalary: null, bonus: null },
+      _avg: { baseSalary: null },
+    } as never);
+    mockFindFirst.mockResolvedValue(null as never);
+
+    const result = await getSummaryStatsForCountry(Country.US);
+
+    expect(result.currency).toBe("");
+  });
+});
+
+describe("getAverageSalaryByDepartmentForCountry", () => {
+  it("returns average salary per department for the given country", async () => {
+    mockGroupBy.mockResolvedValue([
+      { department: Department.Engineering, _avg: { baseSalary: 115000 } },
+    ] as never);
+
+    const result = await getAverageSalaryByDepartmentForCountry(Country.US);
+
+    expect(result).toEqual([{ department: Department.Engineering, averageSalary: 115000 }]);
+    expect(mockGroupBy).toHaveBeenCalledWith(expect.objectContaining({ where: { country: Country.US } }));
+  });
+});
+
+describe("getAllEmployeesForTopEarnersInCountry", () => {
+  it("returns employees filtered by country", async () => {
+    const employees = [
+      { name: "Alice", department: Department.Engineering, country: Country.US, currency: Currency.USD, baseSalary: 120000, bonus: 15000 },
+    ];
+    mockFindMany.mockResolvedValue(employees as never);
+
+    const result = await getAllEmployeesForTopEarnersInCountry(Country.US);
+
+    expect(result).toEqual(employees);
+    expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ where: { country: Country.US } }));
   });
 });

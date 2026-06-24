@@ -7,12 +7,18 @@ import {
   getDepartmentPayrollForCountry,
   getSalaryRangeByDepartmentForCountry,
   getAllEmployeesForTopEarners,
+  getSummaryStatsForCountry as repoGetSummaryStatsForCountry,
+  getAverageSalaryByDepartmentForCountry as repoGetAverageSalaryByDepartmentForCountry,
+  getAllEmployeesForTopEarnersInCountry,
 } from "./analytics.repository";
 import type {
   SummaryStats,
   PayrollByCountry,
   PayrollByDepartment,
   AverageSalaryByCountry,
+  DepartmentPayroll,
+  CountrySummaryStats,
+  AverageSalaryByDepartment,
   BudgetAllocationByDepartment,
   SalaryRangeByDepartment,
   TopEarner,
@@ -25,6 +31,9 @@ export type {
   PayrollByCountry,
   PayrollByDepartment,
   AverageSalaryByCountry,
+  DepartmentPayroll,
+  CountrySummaryStats,
+  AverageSalaryByDepartment,
   BudgetAllocationByDepartment,
   SalaryRangeByDepartment,
   TopEarner,
@@ -89,4 +98,27 @@ export async function getTopEarnersByCurrency(): Promise<TopEarnersByCurrency> {
   }
 
   return grouped;
+}
+
+export function getSummaryStatsForCountry(country: Country): Promise<CountrySummaryStats> {
+  return repoGetSummaryStatsForCountry(country);
+}
+
+export function getPayrollByDepartmentForCountry(country: Country): Promise<DepartmentPayroll[]> {
+  return getDepartmentPayrollForCountry(country);
+}
+
+export function getAverageSalaryByDepartmentForCountry(
+  country: Country,
+): Promise<AverageSalaryByDepartment[]> {
+  return repoGetAverageSalaryByDepartmentForCountry(country);
+}
+
+export async function getTopEarnersByCountry(country: Country): Promise<TopEarner[]> {
+  const employees = await getAllEmployeesForTopEarnersInCountry(country);
+
+  return employees
+    .map((e) => ({ ...e, totalCompensation: e.baseSalary + e.bonus }))
+    .sort((a, b) => b.totalCompensation - a.totalCompensation)
+    .slice(0, TOP_EARNERS_LIMIT);
 }

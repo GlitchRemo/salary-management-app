@@ -4,6 +4,22 @@ This file records significant specification or architectural decisions made with
 
 ---
 
+## 2026-06-24 — Dashboard changed from global metrics to per-country metrics
+
+**Cause**
+
+The initial dashboard showed global aggregates: payroll by country, average salary by country, and a globally-scoped top earners table grouped by currency. On reflection, comparing USD totals against EUR totals or GBP totals is meaningless — the numbers are in different units. A country with a higher payroll total does not necessarily pay better; it may simply use a numerically larger currency (e.g., INR vs USD).
+
+**Decision**
+
+* Add a single country selector at the top of the dashboard page, stored as a URL search param (`?country=US`, default `US`).
+* All metrics are now scoped to the selected country: summary cards, payroll by department, average salary by department, budget allocation, salary range, and top earners.
+* Removed global cross-country charts: "Payroll by Country" bar chart and "Average Salary by Country" bar chart.
+* Added "Average Salary by Department" bar chart (per selected country) as a direct replacement.
+* Top earners is now a single flat table for the selected country (no currency grouping needed since all employees in a country share the same currency).
+
+---
+
 ## 2026-06-24 — Merged Dashboard and Analytics into a single page
 
 **Cause**

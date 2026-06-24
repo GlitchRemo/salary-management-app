@@ -2,55 +2,54 @@
 
 All metrics are displayed on the Dashboard page (`/dashboard`).
 
+All metrics are scoped to a single selected country. A country selector at the top of the page drives all sections. Comparing metrics across countries is intentionally not supported because employees in different countries use different currencies — cross-currency comparisons are meaningless.
+
+The selected country is stored in the URL as a query parameter (`?country=US`). Defaults to `US`.
+
 ---
 
 ## Summary Cards
 
+All values are for the selected country only.
+
 | Metric | Description |
 |---|---|
-| Employee Count | Total number of employees |
-| Total Payroll | Sum of all base salaries + bonuses |
-| Average Salary | Mean base salary across all employees |
-| Countries Represented | Count of distinct countries |
-
----
-
-## Payroll by Country
-
-| Field | Description |
-|---|---|
-| country | Country name |
-| totalPayroll | Sum of (baseSalary + bonus) for all employees in that country |
-
-Presented as a bar chart.
+| Employee Count | Number of employees in the selected country |
+| Total Payroll | Sum of (baseSalary + bonus) for all employees in the country, in the country's currency |
+| Average Salary | Mean baseSalary for employees in the country, in the country's currency |
+| Currency | The currency used in the selected country |
 
 ---
 
 ## Payroll by Department
 
+For the selected country, shows total payroll broken down by department.
+
 | Field | Description |
 |---|---|
 | department | Department name |
-| totalPayroll | Sum of (baseSalary + bonus) for all employees in that department |
+| totalPayroll | Sum of (baseSalary + bonus) for employees in that department within the selected country |
 
 Presented as a bar chart.
 
 ---
 
-## Average Salary by Country
+## Average Salary by Department
+
+For the selected country, shows the mean base salary per department.
 
 | Field | Description |
 |---|---|
-| country | Country name |
-| averageSalary | Mean baseSalary for employees in that country |
+| department | Department name |
+| averageSalary | Mean baseSalary for employees in that department within the selected country |
 
 Presented as a bar chart.
 
 ---
 
-## Budget Allocation by Department (per Country)
+## Budget Allocation by Department
 
-For a selected country, shows what percentage of that country's total payroll is spent on each department.
+For the selected country, shows what percentage of the country's total payroll is spent on each department.
 
 | Field | Description |
 |---|---|
@@ -58,46 +57,43 @@ For a selected country, shows what percentage of that country's total payroll is
 | totalPayroll | Sum of (baseSalary + bonus) for that department within the selected country |
 | percentage | totalPayroll ÷ country total payroll × 100 |
 
-Presented as a pie chart. A country selector controls which country is displayed. Defaults to the first country alphabetically.
+Presented as a pie chart.
 
 ---
 
-## Salary Range by Department per Country
+## Salary Range by Department
 
-For each country, shows the salary spread (minimum, average, maximum base salary) broken down by department. Only departments that have at least one employee in that country are shown.
+For the selected country, shows the salary spread (minimum, average, maximum base salary) broken down by department.
 
 | Field | Description |
 |---|---|
-| country | Country name |
 | department | Department name |
 | currency | Currency for that country |
-| min | Lowest base salary in that department and country |
-| average | Mean base salary in that department and country |
-| max | Highest base salary in that department and country |
+| min | Lowest base salary in that department within the selected country |
+| average | Mean base salary in that department within the selected country |
+| max | Highest base salary in that department within the selected country |
 
-Presented as a grouped bar chart per country (one group per department, three bars: low / mid / high). A country selector controls which country is displayed.
+Presented as a grouped bar chart (one group per department, three bars: min / average / max).
 
 ---
 
 ## Top Earners
 
-The highest-paid employees by total compensation (baseSalary + bonus), grouped by currency.
+The highest-paid employees in the selected country by total compensation (baseSalary + bonus).
 
-A separate top-10 list is shown for each currency (USD, EUR, GBP, BRL, INR). Employees in different currencies are not compared against each other.
+All employees are in the same currency, so direct comparison is valid.
 
 | Field | Description |
 |---|---|
 | name | Employee full name |
 | department | Department |
-| country | Country |
-| currency | Currency |
 | baseSalary | Base salary |
 | bonus | Bonus |
 | totalCompensation | baseSalary + bonus |
 
-Limit: top 10 employees per currency group.
+Limit: top 10 employees in the selected country.
 
-Presented as a table per currency.
+Presented as a single table.
 
 ---
 
@@ -107,3 +103,4 @@ Presented as a table per currency.
 * All aggregate queries belong in `AnalyticsRepository`.
 * `EmployeeService` must not contain analytics queries.
 * All metrics are computed at query time. No caching.
+* All metrics are scoped to the country selected via the URL search param.

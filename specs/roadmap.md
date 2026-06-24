@@ -317,7 +317,7 @@ Table:
 Commits
 
 1. ✅ feat: implement analytics service
-2. feat: build dashboard page
+2. ✅ feat: build dashboard page
 
 Definition of Done
 

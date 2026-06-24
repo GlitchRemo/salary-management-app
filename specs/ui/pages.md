@@ -51,21 +51,23 @@ Contains:
 
 ### Dashboard Page — `/dashboard`
 
-**Purpose:** Provide organisation-wide metrics and compensation distribution in a single view.
+**Purpose:** Provide country-scoped metrics and compensation distribution in a single view.
+
+**Country selector:** A dropdown at the top of the page controls which country all metrics are shown for. Selection is stored in the URL as `?country=XX`. Defaults to `US`. Changing the country reloads the page with the new country param.
 
 **Components:**
 
-* Four `SummaryCard` organisms:
-  * Employee Count
-  * Total Payroll
-  * Average Salary
-  * Countries Represented
-* Payroll by Country chart (bar chart).
-* Payroll by Department chart (bar chart).
-* Average Salary by Country chart (bar chart).
-* Budget Allocation by Department chart (pie chart with country selector).
-* Salary Range by Department chart (grouped bar chart per country: low / mid / high per department, with country selector).
-* `TopEarnersTable` organism — one table per currency showing top 10 earners within that currency.
+* `CountrySelector` molecule — dropdown, updates URL search param.
+* Four `SummaryCard` atoms:
+  * Employee Count (for selected country)
+  * Total Payroll (for selected country, in country currency)
+  * Average Salary (for selected country, in country currency)
+  * Currency
+* Payroll by Department chart (bar chart, selected country).
+* Average Salary by Department chart (bar chart, selected country).
+* Budget Allocation by Department chart (pie chart, selected country).
+* Salary Range by Department chart (grouped bar chart, selected country: min / average / max per department).
+* `TopEarnersTable` organism — top 10 earners in the selected country by total compensation.
 
 **Loading state:** Skeleton cards and charts while data loads.
 

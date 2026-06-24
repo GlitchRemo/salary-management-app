@@ -27,6 +27,18 @@ export type DepartmentPayroll = {
   totalPayroll: number;
 };
 
+export type CountrySummaryStats = {
+  employeeCount: number;
+  totalPayroll: number;
+  averageSalary: number;
+  currency: string;
+};
+
+export type AverageSalaryByDepartment = {
+  department: string;
+  averageSalary: number;
+};
+
 export type BudgetAllocationByDepartment = {
   department: string;
   totalPayroll: number;

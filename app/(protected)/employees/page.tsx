@@ -8,17 +8,14 @@ import { SearchBar } from "@/components/molecules/SearchBar";
 import { EnumFilterSelect } from "@/components/atoms/EnumFilterSelect";
 import { CsvUpload } from "@/components/organisms/CsvUpload";
 import { PaginationControls } from "@/components/molecules/PaginationControls";
+import { PrimaryTableContainer } from "@/components/molecules/PrimaryTableContainer";
 import { COUNTRY_OPTIONS, DEPARTMENT_OPTIONS } from "@/app/constants";
 import { formatSalary } from "@/lib/formatSalary";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Table from "@mui/material/Table";
-import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
-import Paper from "@mui/material/Paper";
-import TableContainer from "@mui/material/TableContainer";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 export default async function EmployeesPage({
@@ -81,23 +78,20 @@ export default async function EmployeesPage({
           <CsvUpload onImport={handleCsvImport} />
         </Box>
       </Box>
-      <Paper elevation={0} variant="outlined" sx={{ borderRadius: 2, overflow: "hidden" }}>
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ bgcolor: "primary.main" }}>
-                <TableCell sx={{ color: "primary.contrastText", fontWeight: 600 }}>Name</TableCell>
-                <TableCell sx={{ color: "primary.contrastText", fontWeight: 600 }}>Email</TableCell>
-                <TableCell sx={{ color: "primary.contrastText", fontWeight: 600 }}>Department</TableCell>
-                <TableCell sx={{ color: "primary.contrastText", fontWeight: 600 }}>Country</TableCell>
-                <TableCell align="right" sx={{ color: "primary.contrastText", fontWeight: 600 }}>Base Salary</TableCell>
-                <TableCell align="right" sx={{ color: "primary.contrastText", fontWeight: 600 }}>Bonus</TableCell>
-                <TableCell align="right" sx={{ color: "primary.contrastText", fontWeight: 600 }}>Total</TableCell>
-                <TableCell sx={{ color: "primary.contrastText", width: 48 }} />
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {employees.map((emp) => (
+      <PrimaryTableContainer
+        columns={[
+          { label: "Name" },
+          { label: "Email" },
+          { label: "Department" },
+          { label: "Country" },
+          { label: "Base Salary", align: "right" },
+          { label: "Bonus", align: "right" },
+          { label: "Total", align: "right" },
+          { label: "", width: 48 },
+        ]}
+      >
+        <TableBody>
+          {employees.map((emp) => (
                 <TableRow key={emp.id} hover>
                   <TableCell>{emp.name}</TableCell>
                   <TableCell>{emp.email}</TableCell>
@@ -123,15 +117,17 @@ export default async function EmployeesPage({
                   </TableCell>
                 </TableRow>
               ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        </TableBody>
         {employees.length === 0 && (
-          <Typography sx={{ color: "text.secondary", textAlign: "center", py: 4 }}>
-            No employees found.
-          </Typography>
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={8} sx={{ textAlign: "center", py: 4, color: "text.secondary" }}>
+                No employees found.
+              </TableCell>
+            </TableRow>
+          </TableBody>
         )}
-      </Paper>
+      </PrimaryTableContainer>
       <PaginationControls totalPages={totalPages} currentPage={currentPage} />
     </>
   );

@@ -6,6 +6,8 @@ import type {
   PayrollByDepartment,
   AverageSalaryByCountry,
   DepartmentPayroll,
+  CountrySummaryStats,
+  AverageSalaryByDepartment,
   SalaryRangeByDepartment,
   EmployeeForTopEarners,
 } from "./analytics.types";
@@ -16,6 +18,8 @@ export type {
   PayrollByDepartment,
   AverageSalaryByCountry,
   DepartmentPayroll,
+  CountrySummaryStats,
+  AverageSalaryByDepartment,
   SalaryRangeByDepartment,
   EmployeeForTopEarners,
 } from "./analytics.types";
@@ -112,6 +116,57 @@ export async function getSalaryRangeByDepartmentForCountry(
 
 export async function getAllEmployeesForTopEarners(): Promise<EmployeeForTopEarners[]> {
   return prisma.employee.findMany({
+    select: {
+      name: true,
+      department: true,
+      country: true,
+      currency: true,
+      baseSalary: true,
+      bonus: true,
+    },
+  });
+}
+
+export async function getSummaryStatsForCountry(country: Country): Promise<CountrySummaryStats> {
+  const [employeeCount, agg, currencyResult] = await Promise.all([
+    prisma.employee.count({ where: { country } }),
+    prisma.employee.aggregate({
+      where: { country },
+      _sum: { baseSalary: true, bonus: true },
+      _avg: { baseSalary: true },
+    }),
+    prisma.employee.findFirst({ where: { country }, select: { currency: true } }),
+  ]);
+
+  return {
+    employeeCount,
+    totalPayroll: (agg._sum.baseSalary ?? 0) + (agg._sum.bonus ?? 0),
+    averageSalary: agg._avg.baseSalary ?? 0,
+    currency: currencyResult?.currency ?? "",
+  };
+}
+
+export async function getAverageSalaryByDepartmentForCountry(
+  country: Country,
+): Promise<AverageSalaryByDepartment[]> {
+  const rows = await prisma.employee.groupBy({
+    by: ["department"],
+    where: { country },
+    _avg: { baseSalary: true },
+    orderBy: { department: "asc" },
+  });
+
+  return rows.map((r) => ({
+    department: r.department,
+    averageSalary: r._avg.baseSalary ?? 0,
+  }));
+}
+
+export async function getAllEmployeesForTopEarnersInCountry(
+  country: Country,
+): Promise<EmployeeForTopEarners[]> {
+  return prisma.employee.findMany({
+    where: { country },
     select: {
       name: true,
       department: true,
