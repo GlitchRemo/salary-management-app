@@ -53,6 +53,12 @@ export type SalaryRangeByDepartment = {
   max: number;
 };
 
+export type SalaryDistributionByDepartment = {
+  department: string;
+  belowAveragePercent: number;
+  atOrAboveAveragePercent: number;
+};
+
 export type TopEarner = {
   name: string;
   department: string;

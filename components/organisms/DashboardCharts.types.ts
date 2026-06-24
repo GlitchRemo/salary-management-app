@@ -1,6 +1,7 @@
 import type {
   BudgetAllocationByDepartment,
   SalaryRangeByDepartment,
+  SalaryDistributionByDepartment,
 } from "@/server/modules/analytics/analytics.types";
 
 export type BarChartEntry = {
@@ -20,4 +21,8 @@ export type BudgetAllocationChartProps = {
 
 export type SalaryRangeChartProps = {
   data: SalaryRangeByDepartment[];
+};
+
+export type SalaryDistributionChartProps = {
+  data: SalaryDistributionByDepartment[];
 };

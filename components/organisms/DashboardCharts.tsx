@@ -8,6 +8,7 @@ import type {
   PayrollBarChartProps,
   BudgetAllocationChartProps,
   SalaryRangeChartProps,
+  SalaryDistributionChartProps,
 } from "./DashboardCharts.types";
 
 // --- PayrollBarChart ---
@@ -64,6 +65,40 @@ export function SalaryRangeChart({ data }: SalaryRangeChartProps) {
             { data: data.map((r) => r.average), label: "Average" },
             { data: data.map((r) => r.max), label: "Max" },
           ]}
+          height={280}
+        />
+      )}
+    </ChartCard>
+  );
+}
+
+// --- SalaryDistributionChart ---
+
+export function SalaryDistributionChart({ data }: SalaryDistributionChartProps) {
+  const departments = data.map((r) => r.department);
+
+  return (
+    <ChartCard title="Employees Below Average Salary by Department">
+      {data.length === 0 ? (
+        <Typography color="text.secondary">No data for selected country.</Typography>
+      ) : (
+        <BarChart
+          xAxis={[{ scaleType: "band", data: departments }]}
+          series={[
+            {
+              data: data.map((r) => r.belowAveragePercent),
+              label: "Below Average",
+              stack: "distribution",
+              valueFormatter: (v) => `${v?.toFixed(1)}%`,
+            },
+            {
+              data: data.map((r) => r.atOrAboveAveragePercent),
+              label: "At or Above",
+              stack: "distribution",
+              valueFormatter: (v) => `${v?.toFixed(1)}%`,
+            },
+          ]}
+          yAxis={[{ min: 0, max: 100, valueFormatter: (v: number) => `${v}%` }]}
           height={280}
         />
       )}

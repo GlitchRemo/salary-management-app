@@ -24,6 +24,8 @@ export type {
   EmployeeForTopEarners,
 } from "./analytics.types";
 
+type EmployeeSalaryRecord = { department: string; baseSalary: number };
+
 export async function getSummaryStats(): Promise<SummaryStats> {
   const [employeeCount, payrollAgg, salaryAgg, countryGroups] = await Promise.all([
     prisma.employee.count(),
@@ -175,5 +177,14 @@ export async function getAllEmployeesForTopEarnersInCountry(
       baseSalary: true,
       bonus: true,
     },
+  });
+}
+
+export async function getEmployeeSalariesByDepartmentForCountry(
+  country: Country,
+): Promise<EmployeeSalaryRecord[]> {
+  return prisma.employee.findMany({
+    where: { country },
+    select: { department: true, baseSalary: true },
   });
 }

@@ -8,8 +8,8 @@ vi.mock("@/server/modules/analytics/analytics.service", () => ({
     averageSalary: 90000,
     currency: "USD",
   }),
-  getPayrollByDepartmentForCountry: vi.fn().mockResolvedValue([
-    { department: "Engineering", totalPayroll: 400000 },
+  getSalaryDistributionByDepartment: vi.fn().mockResolvedValue([
+    { department: "Engineering", belowAveragePercent: 60, atOrAboveAveragePercent: 40 },
   ]),
   getAverageSalaryByDepartmentForCountry: vi.fn().mockResolvedValue([
     { department: "Engineering", averageSalary: 110000 },
@@ -70,9 +70,9 @@ describe("DashboardPage", () => {
     expect(screen.getByText("USD")).toBeInTheDocument();
   });
 
-  it("renders the payroll and average salary charts", async () => {
+  it("renders the salary distribution and average salary charts", async () => {
     render(await DashboardPage({ searchParams: makeSearchParams() }));
-    expect(screen.getByText("Payroll by Department")).toBeInTheDocument();
+    expect(screen.getByText("Employees Below Average Salary by Department")).toBeInTheDocument();
     expect(screen.getAllByText(/Average Salary/).length).toBeGreaterThan(0);
   });
 

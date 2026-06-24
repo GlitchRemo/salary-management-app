@@ -12,6 +12,7 @@ vi.mock("./analytics.repository", () => ({
   getSummaryStatsForCountry: vi.fn(),
   getAverageSalaryByDepartmentForCountry: vi.fn(),
   getAllEmployeesForTopEarnersInCountry: vi.fn(),
+  getEmployeeSalariesByDepartmentForCountry: vi.fn(),
 }));
 
 import {
@@ -20,6 +21,7 @@ import {
   getSummaryStatsForCountry as repoGetSummaryStatsForCountry,
   getAverageSalaryByDepartmentForCountry as repoGetAvgByDept,
   getAllEmployeesForTopEarnersInCountry,
+  getEmployeeSalariesByDepartmentForCountry,
 } from "./analytics.repository";
 import {
   getBudgetAllocationByDepartment,
@@ -27,6 +29,7 @@ import {
   getSummaryStatsForCountry,
   getAverageSalaryByDepartmentForCountry,
   getTopEarnersByCountry,
+  getSalaryDistributionByDepartment,
 } from "./analytics.service";
 
 const mockGetDepartmentPayroll = vi.mocked(getDepartmentPayrollForCountry);
@@ -34,6 +37,7 @@ const mockGetAllEmployees = vi.mocked(getAllEmployeesForTopEarners);
 const mockGetSummaryStatsForCountry = vi.mocked(repoGetSummaryStatsForCountry);
 const mockGetAvgByDept = vi.mocked(repoGetAvgByDept);
 const mockGetAllEmployeesInCountry = vi.mocked(getAllEmployeesForTopEarnersInCountry);
+const mockGetEmployeeSalaries = vi.mocked(getEmployeeSalariesByDepartmentForCountry);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -193,5 +197,62 @@ describe("getTopEarnersByCountry", () => {
     const result = await getTopEarnersByCountry(Country.US);
 
     expect(result).toHaveLength(10);
+  });
+});
+
+describe("getSalaryDistributionByDepartment", () => {
+  it("counts employees below the department average", async () => {
+    // Avg Engineering = 90000; 70000 is below, 110000 is above
+    mockGetEmployeeSalaries.mockResolvedValue([
+      { department: Department.Engineering, baseSalary: 70000 },
+      { department: Department.Engineering, baseSalary: 110000 },
+    ]);
+
+    const result = await getSalaryDistributionByDepartment(Country.US);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].department).toBe(Department.Engineering);
+    expect(result[0].belowAveragePercent).toBe(50);
+    expect(result[0].atOrAboveAveragePercent).toBe(50);
+  });
+
+  it("returns 0% below average when all salaries are equal (none strictly below avg)", async () => {
+    mockGetEmployeeSalaries.mockResolvedValue([
+      { department: Department.Finance, baseSalary: 80000 },
+      { department: Department.Finance, baseSalary: 80000 },
+    ]);
+
+    const result = await getSalaryDistributionByDepartment(Country.US);
+
+    expect(result[0].belowAveragePercent).toBe(0);
+    expect(result[0].atOrAboveAveragePercent).toBe(100);
+  });
+
+  it("returns results sorted alphabetically by department", async () => {
+    mockGetEmployeeSalaries.mockResolvedValue([
+      { department: Department.Product, baseSalary: 90000 },
+      { department: Department.Engineering, baseSalary: 90000 },
+    ]);
+
+    const result = await getSalaryDistributionByDepartment(Country.US);
+
+    expect(result[0].department).toBe(Department.Engineering);
+    expect(result[1].department).toBe(Department.Product);
+  });
+
+  it("returns an empty array when there are no employees", async () => {
+    mockGetEmployeeSalaries.mockResolvedValue([]);
+
+    const result = await getSalaryDistributionByDepartment(Country.US);
+
+    expect(result).toEqual([]);
+  });
+
+  it("passes the country to the repository", async () => {
+    mockGetEmployeeSalaries.mockResolvedValue([]);
+
+    await getSalaryDistributionByDepartment(Country.DE);
+
+    expect(mockGetEmployeeSalaries).toHaveBeenCalledWith(Country.DE);
   });
 });

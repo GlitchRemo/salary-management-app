@@ -10,6 +10,7 @@ import {
   getSummaryStatsForCountry as repoGetSummaryStatsForCountry,
   getAverageSalaryByDepartmentForCountry as repoGetAverageSalaryByDepartmentForCountry,
   getAllEmployeesForTopEarnersInCountry,
+  getEmployeeSalariesByDepartmentForCountry,
 } from "./analytics.repository";
 import type {
   SummaryStats,
@@ -21,6 +22,7 @@ import type {
   AverageSalaryByDepartment,
   BudgetAllocationByDepartment,
   SalaryRangeByDepartment,
+  SalaryDistributionByDepartment,
   TopEarner,
   TopEarnersByCurrency,
 } from "./analytics.types";
@@ -36,6 +38,7 @@ export type {
   AverageSalaryByDepartment,
   BudgetAllocationByDepartment,
   SalaryRangeByDepartment,
+  SalaryDistributionByDepartment,
   TopEarner,
   TopEarnersByCurrency,
 } from "./analytics.types";
@@ -121,4 +124,31 @@ export async function getTopEarnersByCountry(country: Country): Promise<TopEarne
     .map((e) => ({ ...e, totalCompensation: e.baseSalary + e.bonus }))
     .sort((a, b) => b.totalCompensation - a.totalCompensation)
     .slice(0, TOP_EARNERS_LIMIT);
+}
+
+export async function getSalaryDistributionByDepartment(
+  country: Country,
+): Promise<SalaryDistributionByDepartment[]> {
+  const employees = await getEmployeeSalariesByDepartmentForCountry(country);
+
+  const byDept = new Map<string, number[]>();
+  for (const emp of employees) {
+    const salaries = byDept.get(emp.department) ?? [];
+    salaries.push(emp.baseSalary);
+    byDept.set(emp.department, salaries);
+  }
+
+  return Array.from(byDept.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([department, salaries]) => {
+      const avg = salaries.reduce((s, v) => s + v, 0) / salaries.length;
+      const belowAverage = salaries.filter((s) => s < avg).length;
+      const total = salaries.length;
+      const belowAveragePercent = total > 0 ? (belowAverage / total) * 100 : 0;
+      return {
+        department,
+        belowAveragePercent,
+        atOrAboveAveragePercent: 100 - belowAveragePercent,
+      };
+    });
 }

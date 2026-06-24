@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import type { BudgetAllocationByDepartment, SalaryRangeByDepartment } from "@/server/modules/analytics/analytics.types";
+import type { BudgetAllocationByDepartment, SalaryRangeByDepartment, SalaryDistributionByDepartment } from "@/server/modules/analytics/analytics.types";
 
 vi.mock("@mui/x-charts/BarChart", () => ({
   BarChart: () => <div data-testid="bar-chart" />,
@@ -10,7 +10,7 @@ vi.mock("@mui/x-charts/PieChart", () => ({
   PieChart: () => <div data-testid="pie-chart" />,
 }));
 
-import { PayrollBarChart, BudgetAllocationChart, SalaryRangeChart } from "./DashboardCharts";
+import { PayrollBarChart, BudgetAllocationChart, SalaryRangeChart, SalaryDistributionChart } from "./DashboardCharts";
 
 // --- PayrollBarChart ---
 describe("PayrollBarChart", () => {
@@ -65,6 +65,28 @@ describe("SalaryRangeChart", () => {
 
   it("shows a message when data is empty", () => {
     render(<SalaryRangeChart data={[]} />);
+    expect(screen.getByText(/no data for selected country/i)).toBeInTheDocument();
+  });
+});
+
+// --- SalaryDistributionChart ---
+const distributionData: SalaryDistributionByDepartment[] = [
+  { department: "Engineering", belowAveragePercent: 60, atOrAboveAveragePercent: 40 },
+];
+
+describe("SalaryDistributionChart", () => {
+  it("renders the title", () => {
+    render(<SalaryDistributionChart data={distributionData} />);
+    expect(screen.getByText("Employees Below Average Salary by Department")).toBeInTheDocument();
+  });
+
+  it("renders the bar chart when data is present", () => {
+    render(<SalaryDistributionChart data={distributionData} />);
+    expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
+  });
+
+  it("shows a message when data is empty", () => {
+    render(<SalaryDistributionChart data={[]} />);
     expect(screen.getByText(/no data for selected country/i)).toBeInTheDocument();
   });
 });
