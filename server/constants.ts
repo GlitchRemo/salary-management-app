@@ -5,3 +5,4 @@ export const ERROR_MESSAGES = {
 } as const;
 
 export const DEFAULT_PAGE_SIZE = 25;
+export const TOP_EARNERS_LIMIT = 10;
