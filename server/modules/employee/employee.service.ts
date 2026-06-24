@@ -3,6 +3,7 @@ import { findAllEmployees, findEmployeeById, upsertManyEmployees } from "./emplo
 import { toEmployeeDto } from "./employee.mapper";
 import { parseCSV } from "@/server/modules/csv/csv-parser.service";
 import { DEFAULT_PAGE_SIZE } from "@/server/constants";
+import { logger } from "@/server/logger";
 import type { EmployeeDto, EmployeeFilters, ImportResult, PaginatedEmployees } from "./employee.types";
 
 const FUSE_OPTIONS = {
@@ -44,8 +45,11 @@ export async function getEmployee(id: string): Promise<EmployeeDto | null> {
 export async function importEmployees(csvContent: string, changedById: string): Promise<ImportResult> {
   const parseResult = parseCSV(csvContent);
   if (!parseResult.success) {
+    logger.warn("importEmployees", "CSV parse failed", { errors: parseResult.errors });
     return { success: false, errors: parseResult.errors };
   }
+  logger.info("importEmployees", "Starting bulk upsert", { rowCount: parseResult.rows.length });
   const imported = await upsertManyEmployees(parseResult.rows, changedById);
+  logger.info("importEmployees", "Bulk upsert complete", { imported, total: parseResult.rows.length });
   return { success: true, imported };
 }

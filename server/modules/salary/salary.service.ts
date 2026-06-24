@@ -6,6 +6,7 @@ import {
 } from "./salary.repository";
 import { ValidationError, NotFoundError } from "@/server/errors";
 import { ERROR_MESSAGES } from "@/server/constants";
+import { logger } from "@/server/logger";
 import type { SalaryUpdateParams } from "./salary.types";
 
 export type { SalaryUpdateParams } from "./salary.types";
@@ -27,9 +28,11 @@ export async function updateSalary(params: SalaryUpdateParams): Promise<Employee
 
   const salaryUnchanged = employee.baseSalary === baseSalary && employee.bonus === bonus;
   if (salaryUnchanged) {
+    logger.info("updateSalary", "No-op: salary unchanged", { employeeId });
     return employee;
   }
 
+  logger.info("updateSalary", "Updating salary", { employeeId, baseSalary, bonus });
   const updated = await updateEmployeeSalary(employeeId, { baseSalary, bonus });
 
   await createSalaryAudit({
@@ -41,5 +44,6 @@ export async function updateSalary(params: SalaryUpdateParams): Promise<Employee
     newBonus: bonus,
   });
 
+  logger.info("updateSalary", "Salary updated and audited", { employeeId });
   return updated;
 }

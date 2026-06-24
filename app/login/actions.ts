@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { login } from "@/server/modules/auth/auth.service";
 import { UnauthorizedError } from "@/server/errors";
+import { logger } from "@/server/logger";
 
 const SESSION_COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
 
@@ -28,6 +29,9 @@ export async function loginAction(
     return { error: "Email and password are required." };
   }
 
+  const { email } = parsed.data;
+  logger.info("loginAction", "Login attempt", { email });
+
   try {
     const token = await login(parsed.data);
     const cookieStore = await cookies();
@@ -38,8 +42,10 @@ export async function loginAction(
       sameSite: "strict",
       secure: process.env.NODE_ENV === "production",
     });
+    logger.info("loginAction", "Login successful", { email });
   } catch (error) {
     if (error instanceof UnauthorizedError) {
+      logger.warn("loginAction", "Login failed — invalid credentials", { email });
       return { error: "Invalid email or password." };
     }
     throw error;

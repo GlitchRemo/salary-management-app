@@ -2,6 +2,7 @@ import { prisma } from "@/server/db/client";
 import type { Employee } from "@/app/generated/prisma/client";
 import type { EmployeeFilters, EmployeeRow } from "./employee.types";
 import type { CsvRow } from "@/server/modules/csv/csv-parser.types";
+import { logger } from "@/server/logger";
 
 export type { EmployeeRow } from "./employee.types";
 
@@ -80,8 +81,11 @@ export async function upsertManyEmployees(rows: CsvRow[], changedById: string): 
       });
 
       successCount++;
-    } catch {
-      // Individual row failure does not abort remaining rows
+    } catch (err) {
+      logger.error("upsertManyEmployees", "Row upsert failed — skipping", {
+        employeeId: row.employeeId,
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   }
 
